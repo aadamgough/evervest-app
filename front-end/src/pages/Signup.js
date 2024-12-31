@@ -21,6 +21,36 @@ function Signup() {
         }));
     };
 
+    const createAccount = async (data) => {
+        console.log('Sending signup data:', data); // Debug log
+        
+        try {
+            const response = await fetch('http://localhost:5001/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    password: data.password
+                })
+            });
+    
+            const responseData = await response.json();
+            console.log('Server response:', responseData); // Debug log
+            
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Signup failed');
+            }
+    
+            return responseData;
+        } catch (error) {
+            console.error('Signup error:', error);
+            throw error;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -32,43 +62,12 @@ function Signup() {
                 setSuccessMessage('Successfully signed up!');
                 // Wait for 2 seconds before redirecting to show the success message
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    navigate('/dashboard'); 
                 }, 2000);
             }
         } catch (error) {
-            console.error('Signup error:', error);
+            console.error('Signup error in handleSubmit:', error);
             setError('An error occurred during signup.');
-        }
-    };
-
-    const createAccount = async (data) => {
-        try {
-            const response = await fetch('http://localhost:5001/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(data),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Signup failed');
-            }
-
-            const responseData = await response.json();
-            
-            // Store the token if your backend sends one
-            if (responseData.token) {
-                localStorage.setItem('authToken', responseData.token);
-            }
-
-            return true;
-        } catch (error) {
-            console.error('Signup error:', error);
-            throw error;
         }
     };
 

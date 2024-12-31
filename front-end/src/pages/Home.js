@@ -13,34 +13,36 @@ function Home() {
     const [error, setError] = useState('');
 
     const authenticateUser = async (email, password) => {
+      console.log('Starting authentication...'); // Debug log
       try {
-          const response = await fetch('http://localhost:5001/login', {
+          const response = await fetch('http://localhost:5001/api/login', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
                   'Accept': 'application/json'
               },
               body: JSON.stringify({ email, password }),
-              credentials: 'include' // This is important if you're using cookies for sessions
+              credentials: 'include'
           });
   
+          const data = await response.json();
+          console.log('Server response:', data); // Debug log
+          
           if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Authentication failed');
+              throw new Error(data.message || 'Authentication failed');
           }
   
-          const data = await response.json();
-          
-          // Store the token if your backend sends one
-          if (data.token) {
-              localStorage.setItem('authToken', data.token);
+          // Store user data and return the data
+          if (data.user) {
+              localStorage.setItem('user', JSON.stringify(data.user));
+              return data;
+          } else {
+              throw new Error('No user data received');
           }
-          
-          return true;
       } catch (error) {
           console.error('Authentication error:', error);
-          throw error; // This will allow the handleLogin function to catch and display the error
-      }
+          throw error;
+        }
     };
     
     const handleLogin = async (e) => {
@@ -48,13 +50,18 @@ function Home() {
       setError('');
       
       try {
-          await authenticateUser(email, password);
+          const response = await authenticateUser(email, password);
+          console.log('Login response:', response);
+          
+          // Store user info in localStorage
+          localStorage.setItem('user', JSON.stringify(response.user));
+          
           navigate('/dashboard');
       } catch (error) {
-          console.error('Login error:', error);
+          console.error('Login handler error:', error);
           setError(error.message || 'Failed to login. Please check your credentials.');
       }
-    };
+  };
 
     const handleSignup = () => {
         navigate('/signup'); // Redirect to signup form
@@ -68,73 +75,95 @@ function Home() {
         <body class="body">
           <div id="grain" className="title-container" style={{ position: "relative", overflow: "hidden" }}></div>
           <div class="navbar w-nav">
-            <div class="nav-container w-container">
+            <div className="nav-container w-container">
                 <Link to="/" className="logo w-nav-brand w--current">
-                    <div className="name-text">
-                        <h1>Evervest FP</h1>
-                    </div>
+                  <div className="name-text">
+                    <h1>Evervest</h1>
+                  </div>
                 </Link>
-              <nav role="navigation" class="nav-menu w-nav-menu">
-                <div class="nav-div-left">
-                    <Link to="/our-story" className="nav-text-link">Our Story</Link>
-                    <Link to="/our-team" className="nav-text-link">Our Team</Link>
-                    <Link to="/contact" className="nav-text-link">Contact Us</Link>
-                </div>
-              </nav>
+                <nav role="navigation" className="nav-menu w-nav-menu">
+                  <div className="nav-links" style={{ marginRight: 'auto' }}>
+                    <div className="dropdown">
+                      <Link to="/product" className="nav-text-link">Product</Link>
+                      <div className="dropdown-content">
+                        <Link to="/feature1">Feature 1</Link>
+                        <Link to="/feature2">Feature 2</Link>
+                      </div>
+                    </div>
+                    <div className="dropdown">
+                      <Link to="/solutions" className="nav-text-link">Solutions</Link>
+                      <div className="dropdown-content">
+                        <Link to="/solution1">Solution 1</Link>
+                        <Link to="/solution2">Solution 2</Link>
+                      </div>
+                    </div>
+                    <div className="dropdown">
+                      <Link to="/resources" className="nav-text-link">Resources</Link>
+                      <div className="dropdown-content">
+                        <Link to="/blog">Blog</Link>
+                        <Link to="/faq">FAQ</Link>
+                      </div>
+                    </div>
+                    <Link to="/enterprise" className="nav-text-link">Enterprise</Link>
+                    <Link to="/pricing" className="nav-text-link">Pricing</Link>
+                  </div>
+                  <div className="nav-actions" style={{ marginLeft: 'auto' }}>
+                    <Link to="/contact-sales" className="nav-action-link">Contact Sales</Link>
+                    <Link to="/login" className="nav-action-link">Login</Link>
+                    <Link to="/signup" className="signup-button">Sign up</Link>
+                  </div>
+                </nav>
             </div>
             <div class="w-nav-overlay"></div>
           </div>
-          <section class="hero-wrapper">
-            <div class="hero-div">
-              <p class="hero-text">
-                  Evervest Financial Planning
-              </p>
-              <h1>
-                Empower your future sustainably.
-              </h1>
+          <section className="hero-wrapper">
+            <div className="hero-content-container">
+              {/* Left side - Login content */}
+              <div className="hero-left">
+                <div className="hero-text-container">
+                  <p className="hero-text">
+                    Evervest Financial Planning
+                  </p>
+                  <h1>
+                    Empower your future sustainably.
+                  </h1>
+                </div>
+                <div className="email-pass-container">
+                  <div className="input-wrapper">
+                    <input 
+                      type="email" 
+                      placeholder="Enter your email" 
+                      className="email-input"
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <input 
+                      type="password" 
+                      placeholder="Enter your password" 
+                      className="password-input"
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="sign-log-in-container">
+                  <div className="auth-buttons">
+                    <button className="auth-btn login-btn" onClick={handleLogin}>Log In</button>
+                    <span className="auth-divider">or</span>
+                    <button className="auth-btn signup-btn" onClick={handleSignup}>Sign Up</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right side - Image */}
+              <div className="hero-right">
+                <img 
+                  src="/path-to-your-image.jpg" 
+                  alt="Financial planning illustration" 
+                  className="hero-image"
+                />
+              </div>
             </div>
           </section>
-          <div class="email-pass-container">
-            <div class="input-wrapper">
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                class="email-input"
-                onChange={(e) => setEmail(e.target.value)}
-                style={{fontFamily: 'Madeinfinity-regular'}}
-              />
-              <input 
-                type="password" 
-                placeholder="Enter your password" 
-                class="password-input"
-                onChange={(e) => setPassword(e.target.value)}
-                style={{fontFamily: 'Madeinfinity-regular'}}
-              />
-            </div>
-          </div>
-          <div class="sign-log-in-container">
-            <div style={{fontFamily: 'Madeinfinity-regular'}} class="auth-buttons">
-              <button class="auth-btn login-btn" onClick={handleLogin}>Log In</button>
-              <span class="auth-divider">or</span>
-              <button class="auth-btn signup-btn" onClick={handleSignup}>Sign Up</button>
-            </div>
-            <div style={{fontFamily: 'Madeinfinity-regular'}} class="social-login">
-              <p class="social-text">Or continue with</p>
-            </div>
-          </div>
-          <div class="socials-container">
-            <div class="social-buttons">
-              <button class="social-btn">
-                <img src={googleLogo} alt="Google" />
-              </button>
-              <button class="social-btn">
-                <img src={facebookLogo} alt="Facebook" />
-              </button>
-              <button class="social-btn">
-                <img src={xLogo} alt="X" />
-              </button>
-            </div>
-          </div>
+        
       </body>
       </div>
     );
