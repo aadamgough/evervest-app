@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import PageTransition from '../PageTransition';
 import { IoArrowBack } from 'react-icons/io5'; // Install with: npm install react-icons
 import '../App.css';
 
@@ -7,24 +8,40 @@ function Questionnaire() {
     const navigate = useNavigate();
 
     return (
+        <PageTransition>
         <div className="Questionnaire">
             {/* Header and Navbar */}
             <header className="header">
                 <div className="navbar w-nav">
-                    <div className="nav-container w-container">
-                        <Link to="/" className="logo w-nav-brand w--current">
-                            <div className="name-text">
-                                <h1>Evervest FP</h1>
-                            </div>
-                        </Link>
-                        <nav role="navigation" className="nav-menu w-nav-menu">
-                            <div className="nav-div-left">
-                                <Link to="/dashboard" className="nav-text-link">Dashboard</Link>
-                                <Link to="/investments" className="nav-text-link">My Investments</Link>
-                                <Link to="/profile" className="nav-text-link">Profile</Link>
-                            </div>
-                        </nav>
+                <div className="nav-container w-container">
+                    <Link to="/" className="logo w-nav-brand w--current">
+                    <div className="name-text">
+                        <h1>Evervest</h1>
                     </div>
+                    </Link>
+                    <nav role="navigation" className="nav-menu w-nav-menu">
+                    <div className="nav-links" style={{ marginRight: 'auto' }}>
+                        <div className="dropdown">
+                        <Link to="/dashboard" className="nav-text-link">Home</Link>
+                        </div>
+                        <div className="dropdown">
+                        <Link to="/solutions" className="nav-text-link">Investments</Link>
+                        <div className="dropdown-content">
+                            <Link to="/solution1">Portfolio 1</Link>
+                            <Link to="/solution2">Portfolio 2</Link>
+                        </div>
+                        </div>
+                        <div className="dropdown">
+                        <Link to="/resources" className="nav-text-link">Profile</Link>
+                        </div>
+                        <Link to="/questionnaire" className="nav-text-link">Questionnaires</Link>
+                    </div>
+                    <div className="nav-actions" style={{ marginLeft: 'auto' }}>
+                        <Link to="/contact-sales" className="nav-action-link">Contact Support</Link>
+                        <Link to="/signup" className="signup-button">Logout</Link>
+                    </div>
+                    </nav>
+                </div>
                 </div>
             </header>
 
@@ -36,20 +53,22 @@ function Questionnaire() {
                         onClick={() => navigate('/dashboard')} 
                         className="back-button"
                     >
-                        <IoArrowBack /> Back to Dashboard
                     </button>
                 </div>
                 <div className="questionnaire-content-inner">
-                    <h1 style={{fontFamily: 'Madeinfinity-regular'}}>
-                        Questionnaires
+                    <h1>
+                        Discover your ideal investment strategy through our custom questionnaires
                     </h1>
+                    <p>
+                        Our advanced questionnaires leverage sophisticated <strong>machine 
+                        learning</strong> to identify the best investment strategies tailored 
+                        to your goals.
+                    </p>
 
-                    <h2>
-                        Our advanced questionnaires leverage sophisticated machine 
-                        learning to identify the best investment strategies tailored 
-                        to your goals. Choose from one of three options to begin 
-                        investing in a sustainable future—for yourself and for the planet.
-                    </h2>
+                    <p>
+                    Choose from one of three options to begin 
+                    investing in a <strong>sustainable future</strong>—for yourself and for the planet.
+                    </p>
 
                     <div className="questionnaire-buttons-container">
                         <div className="questionnaire-item">
@@ -82,6 +101,7 @@ function Questionnaire() {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 }
 

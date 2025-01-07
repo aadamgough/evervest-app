@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import googleLogo from '../logos/google.png';
-import facebookLogo from '../logos/facebook.png';
-import xLogo from '../logos/x.png';
+import farmImage from '../logos/farm.jpeg';
+import PageTransition from '../PageTransition';
 import '../App.css';
 
 function Home() {
@@ -68,9 +67,9 @@ function Home() {
     };
 
     return (
+      <PageTransition>
       <div className="Home">
         <head>
-  
         </head>
         <body class="body">
           <div id="grain" className="title-container" style={{ position: "relative", overflow: "hidden" }}></div>
@@ -121,12 +120,16 @@ function Home() {
               {/* Left side - Login content */}
               <div className="hero-left">
                 <div className="hero-text-container">
-                  <p className="hero-text">
-                    Evervest Financial Planning
-                  </p>
-                  <h1>
-                    Empower your future sustainably.
+                  <h1 className="hero-text">
+                    Empower your<br />
+                    future sustainably
                   </h1>
+                  <p>
+                    Evervest is your team's platform for powerful<br />
+                    automation, data integration, and seamless<br />
+                    collaboration — redefining financial planning<br />
+                    and investment decisions.
+                  </p>
                 </div>
                 <div className="email-pass-container">
                   <div className="input-wrapper">
@@ -152,11 +155,9 @@ function Home() {
                   </div>
                 </div>
               </div>
-
-              {/* Right side - Image */}
               <div className="hero-right">
                 <img 
-                  src="/path-to-your-image.jpg" 
+                  src={farmImage}
                   alt="Financial planning illustration" 
                   className="hero-image"
                 />
@@ -166,6 +167,7 @@ function Home() {
         
       </body>
       </div>
+      </PageTransition>
     );
   }
   
