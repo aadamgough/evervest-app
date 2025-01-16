@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import PageTransition from '../PageTransition';
 import '../App.css'
 
 function Signup() {
@@ -72,23 +73,49 @@ function Signup() {
     };
 
     return (
+        <PageTransition>
         <div className="Signup">
             {/* Add the header section similar to Home */}
             <header className="header">
-                <div class="navbar w-nav">
-                    <div class="nav-container w-container">
-                        <Link to="/" className="logo w-nav-brand w--current">
-                            <div className="name-text">
-                        <h1>Evervest FP</h1>
-                    </div>
+            <div class="navbar w-nav">
+            <div className="nav-container w-container">
+                <Link to="/" className="logo w-nav-brand w--current">
+                  <div className="name-text">
+                    <h1>Evervest</h1>
+                  </div>
                 </Link>
-              <nav role="navigation" class="nav-menu w-nav-menu">
-                <div class="nav-div-left">
-                    <Link to="/our-story" className="nav-text-link">Our Story</Link>
-                    <Link to="/our-team" className="nav-text-link">Our Team</Link>
-                    <Link to="/contact" className="nav-text-link">Contact Us</Link>
-                </div>
-              </nav>
+                <nav role="navigation" className="nav-menu w-nav-menu">
+                  <div className="nav-links" style={{ marginRight: 'auto' }}>
+                    <div className="dropdown">
+                      <Link to="/product" className="nav-text-link">Product</Link>
+                      <div className="dropdown-content">
+                        <Link to="/feature1">Feature 1</Link>
+                        <Link to="/feature2">Feature 2</Link>
+                      </div>
+                    </div>
+                    <div className="dropdown">
+                      <Link to="/solutions" className="nav-text-link">Solutions</Link>
+                      <div className="dropdown-content">
+                        <Link to="/solution1">Solution 1</Link>
+                        <Link to="/solution2">Solution 2</Link>
+                      </div>
+                    </div>
+                    <div className="dropdown">
+                      <Link to="/resources" className="nav-text-link">Resources</Link>
+                      <div className="dropdown-content">
+                        <Link to="/blog">Blog</Link>
+                        <Link to="/faq">FAQ</Link>
+                      </div>
+                    </div>
+                    <Link to="/enterprise" className="nav-text-link">Enterprise</Link>
+                    <Link to="/pricing" className="nav-text-link">Pricing</Link>
+                  </div>
+                  <div className="nav-actions" style={{ marginLeft: 'auto' }}>
+                    <Link to="/contact-sales" className="nav-action-link">Contact Sales</Link>
+                    <Link to="/login" className="nav-action-link">Login</Link>
+                    <Link to="/signup" className="signup-button">Sign up</Link>
+                  </div>
+                </nav>
             </div>
             <div class="w-nav-overlay"></div>
             </div>
@@ -97,10 +124,21 @@ function Signup() {
             {/* Main signup content */}
             <div className="email-pass-container">
                 <div className="input-wrapper">
-                    <h2 style={{fontFamily: 'Madeinfinity-regular', textAlign: 'center', marginBottom: '20px'}}>
+                    <h2 style={{ textAlign: 'center', marginBottom: '20px'}}>
                         Create Your Account
                     </h2>
-                    <form onSubmit={handleSubmit}>
+                    <form 
+                    onSubmit={handleSubmit}
+                    style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        maxWidth: '400px',
+                        margin: '0 auto'
+                    }}
+                    >
                         <input
                             type="text"
                             name="name"
@@ -108,7 +146,7 @@ function Signup() {
                             onChange={handleChange}
                             placeholder="Full Name"
                             className="email-input"
-                            style={{fontFamily: 'Madeinfinity-regular', marginBottom: '10px'}}
+                            style={{ marginBottom: '10px'}}
                             required
                         />
                         <input
@@ -118,7 +156,7 @@ function Signup() {
                             onChange={handleChange}
                             placeholder="Email"
                             className="email-input"
-                            style={{fontFamily: 'Madeinfinity-regular', marginBottom: '10px'}}
+                            style={{ marginBottom: '10px'}}
                             required
                         />
                         <input
@@ -128,14 +166,14 @@ function Signup() {
                             onChange={handleChange}
                             placeholder="Password"
                             className="password-input"
-                            style={{fontFamily: 'Madeinfinity-regular', marginBottom: '20px'}}
+                            style={{ marginBottom: '20px'}}
                             required
                         />
                         {error && <div className="error-message" style={{color: 'red'}}>{error}</div>}
                         {successMessage && <div className="success-message" style={{color: 'green'}}>{successMessage}</div>}
                         
                         <div className="sign-log-in-container">
-                            <div style={{fontFamily: 'Madeinfinity-regular'}} className="auth-buttons">
+                            <div className="auth-buttons">
                                 <button type="submit" className="auth-btn signup-btn">
                                     Create Account
                                 </button>
@@ -145,6 +183,7 @@ function Signup() {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 }
 

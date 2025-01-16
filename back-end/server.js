@@ -1,138 +1,159 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs').promises;
-const path = require('path');
 const bcrypt = require('bcrypt');
+const { createClient } = require('@supabase/supabase-js'); // Change to require syntax
+
+// Environment variables should be in a .env file
+require('dotenv').config();
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true
 }));
 app.use(express.json());
 
-// Path to users.json file
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
-
-// Helper functions to read and write to users.json
-async function readUsers() {
+// Add this test endpoint
+app.get('/api/test-db', async (req, res) => {
     try {
-        const data = await fs.readFile(USERS_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        // If file doesn't exist, return empty users array
-        return { users: [] };
-    }
-}
+        console.log('Testing Supabase connection...');
+        console.log('Supabase URL:', process.env.SUPABASE_URL);
+        console.log('Supabase Key exists:', !!process.env.SUPABASE_KEY);
 
-async function writeUsers(users) {
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
-}
+        const { data, error } = await supabase
+            .from('users')
+            .select('count');
+
+        if (error) {
+            console.error('Supabase test error:', error);
+            return res.status(500).json({ 
+                message: 'Database connection failed',
+                error: error.message 
+            });
+        }
+
+        res.status(200).json({
+            message: 'Database connection successful',
+            data: data
+        });
+    } catch (error) {
+        console.error('Test endpoint error:', error);
+        res.status(500).json({ 
+            message: 'Test failed',
+            error: error.message 
+        });
+    }
+});
 
 // Signup endpoint
 app.post('/api/signup', async (req, res) => {
-    console.log('Received signup request:', req.body);
-    
     try {
         const { name, email, password } = req.body;
 
-        // Validate input
         if (!name || !email || !password) {
             return res.status(400).json({
-                message: 'Please provide all required fields'
+                message: 'Please provide all required fields',
             });
         }
 
-        // Read existing users
-        const userData = await readUsers();
-        
-        // Check if user already exists
-        const existingUser = userData.users.find(user => user.email === email);
+        // Check existing user
+        const { data: existingUser, error: findError } = await supabase
+            .from('users')
+            .select('email')  // Only select email field for efficiency
+            .eq('email', email)
+            .single();
+
+        if (findError && findError.code !== 'PGRST116') { // Handle "not found" separately
+            console.error('Supabase find error:', findError);
+            return res.status(500).json({ message: 'Error checking user existence' });
+        }
+
         if (existingUser) {
             return res.status(400).json({
-                message: 'Email already registered'
+                message: 'Email already registered',
             });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new user object
-        const newUser = {
-            id: Date.now().toString(),
-            name,
-            email,
-            password: hashedPassword
-        };
+        const { data: newUser, error: insertError } = await supabase
+            .from('users')
+            .insert([
+                { 
+                    name, 
+                    email, 
+                    password: hashedPassword,
+                    created_at: new Date().toISOString() // Add timestamp
+                }
+            ])
+            .select('id, name, email, created_at')  // Only select needed fields
+            .single();
 
-        // Add to users array
-        userData.users.push(newUser);
+        if (insertError) {
+            console.error('Supabase insert error:', insertError);
+            return res.status(500).json({ message: 'Error creating user' });
+        }
 
-        // Save to file
-        await writeUsers(userData);
-
-        // Send success response (excluding password)
         res.status(201).json({
             message: 'User created successfully',
-            user: {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email
-            }
+            user: newUser
         });
-
     } catch (error) {
         console.error('Signup error:', error);
-        res.status(500).json({
-            message: 'Error creating user',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-// Add this login endpoint
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const userData = await readUsers();
-        const user = userData.users.find(u => u.email === email);
-        
-        if (!user) {
-            return res.status(401).json({
-                message: 'Invalid email or password'
-            });
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide email and password' });
+        }
+
+        const { data: user, error: findError } = await supabase
+            .from('users')
+            .select('id, name, email, password')  // Only select needed fields
+            .eq('email', email)
+            .single();
+
+        if (findError) {
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
-        
+
         if (!validPassword) {
-            return res.status(401).json({
-                message: 'Invalid email or password'
-            });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Send user info in response
+        // Remove password from user object before sending
+        const { password: _, ...userWithoutPassword } = user;
+
         res.status(200).json({
             message: 'Login successful',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
-            }
+            user: userWithoutPassword
         });
-
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({
-            message: 'Error during login',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
-// Start server
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something broke!' });
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
