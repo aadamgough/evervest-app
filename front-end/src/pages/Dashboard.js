@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
 import '../App.css';
 
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
     
     // Get today's date in a nice format
     const today = new Date().toLocaleDateString('en-US', {
@@ -16,22 +18,61 @@ function Dashboard() {
     });
 
     useEffect(() => {
-        // Check for user data when component mounts
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            setUser(JSON.parse(userData));
-        } else {
-            // Redirect to login if no user data found
-            navigate('/');
-        }
+        // Check for authenticated user and fetch their data
+        const getUser = async () => {
+            try {
+                // Get the current session
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) throw sessionError;
+
+                if (!session) {
+                    navigate('/');
+                    return;
+                }
+
+                // Fetch user profile from your users table
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                setUser(userData);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                navigate('/');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getUser();
     }, [navigate]);
+
+    const handleLogout = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            navigate('/');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <PageTransition>
         <div className="Dashboard">
             {/* Header and Navbar */}
             <header className="header">
-            <div class="navbar w-nav">
+            <div className="navbar w-nav">
                 <div className="nav-container w-container">
                     <Link to="/" className="logo w-nav-brand w--current">
                     <div className="name-text">
@@ -57,14 +98,20 @@ function Dashboard() {
                     </div>
                     <div className="nav-actions" style={{ marginLeft: 'auto' }}>
                         <Link to="/contact-sales" className="nav-action-link">Contact Support</Link>
-                        <Link to="/signup" className="signup-button">Logout</Link>
+                        <button 
+                            onClick={handleLogout} 
+                            className="signup-button"
+                            style={{ border: 'none', cursor: 'pointer' }}
+                        >
+                            Logout
+                        </button>
                     </div>
                     </nav>
                 </div>
-                <div class="w-nav-overlay"></div>
+                <div className="w-nav-overlay"></div>
             </div>
-
             </header>
+
             <div className="dashboard-content">
                 <div className="welcome-section">
                     <h1>Hello, {user ? user.name : 'User'}</h1>

@@ -1,74 +1,60 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
-import '../App.css'
+import { Link } from 'react-router-dom';
+
 
 function Signup() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        name: '',
-        // Add other fields as needed
-    });
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
 
-    const createAccount = async (data) => {
-        console.log('Sending signup data:', data); // Debug log
-        
         try {
-            const response = await fetch('http://localhost:5001/api/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: data.name,
-                    email: data.email,
-                    password: data.password
-                })
+            // First, create the auth user
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name: name // Store name in auth metadata
+                    }
+                }
             });
-    
-            const responseData = await response.json();
-            console.log('Server response:', responseData); // Debug log
-            
-            if (!response.ok) {
-                throw new Error(responseData.message || 'Signup failed');
+
+            if (authError) throw authError;
+
+            if (authData.user) {
+                // Then create the profile in your users table
+                const { error: profileError } = await supabase
+                    .from('users')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            name: name,
+                            email: email
+                        }
+                    ]);
+
+                if (profileError) throw profileError;
+
+                console.log('Signup successful:', authData);
+                navigate('/dashboard');
             }
-    
-            return responseData;
+
         } catch (error) {
             console.error('Signup error:', error);
-            throw error;
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setSuccessMessage(null); // Clear any previous messages
-        
-        try {
-            const success = await createAccount(formData);
-            if (success) {
-                setSuccessMessage('Successfully signed up!');
-                // Wait for 2 seconds before redirecting to show the success message
-                setTimeout(() => {
-                    navigate('/dashboard'); 
-                }, 2000);
-            }
-        } catch (error) {
-            console.error('Signup error in handleSubmit:', error);
-            setError('An error occurred during signup.');
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -128,7 +114,7 @@ function Signup() {
                         Create Your Account
                     </h2>
                     <form 
-                    onSubmit={handleSubmit}
+                    onSubmit={handleSignup}
                     style={{ 
                         display: 'flex',
                         flexDirection: 'column',
@@ -139,43 +125,35 @@ function Signup() {
                         margin: '0 auto'
                     }}
                     >
+                        {error && <div style={{color: 'red'}}>{error}</div>}
                         <input
                             type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Full Name"
-                            className="email-input"
-                            style={{ marginBottom: '10px'}}
-                            required
+                            placeholder="Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                         <input
                             type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
                             placeholder="Email"
-                            className="email-input"
-                            style={{ marginBottom: '10px'}}
-                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         <input
                             type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
                             placeholder="Password"
-                            className="password-input"
-                            style={{ marginBottom: '20px'}}
-                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
-                        {error && <div className="error-message" style={{color: 'red'}}>{error}</div>}
-                        {successMessage && <div className="success-message" style={{color: 'green'}}>{successMessage}</div>}
+                        
                         
                         <div className="sign-log-in-container">
                             <div className="auth-buttons">
-                                <button type="submit" className="auth-btn signup-btn">
-                                    Create Account
+                                <button 
+                                    type="submit" 
+                                    className="auth-btn signup-btn"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Creating Account...' : 'Create Account'}
                                 </button>
                             </div>
                         </div>

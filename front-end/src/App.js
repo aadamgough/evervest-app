@@ -11,10 +11,13 @@ import Questionnaire from './pages/Questionnaire';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
 import RiskToleranceQuestionnaire from './pages/RiskToleranceQuestionnaire';
 import ESGQuestionnaire from './pages/ESGQuestionnaire';
+import { AuthProvider } from './contexts/AuthContext';
+
 import './App.css';
 
 function App() {
   return (
+    <AuthProvider>
     <AnimatePresence mode="wait">
     <Router>
       <Routes>
@@ -31,6 +34,7 @@ function App() {
       </Routes>
     </Router>
     </AnimatePresence>
+    </AuthProvider>
   );
 }
 

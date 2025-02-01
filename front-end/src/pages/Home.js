@@ -1,70 +1,41 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import farmImage from '../logos/farm.jpeg';
 import PageTransition from '../PageTransition';
 import '../App.css';
 
 function Home() {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-    const authenticateUser = async (email, password) => {
-      console.log('Starting authentication...'); // Debug log
-      try {
-          const response = await fetch('http://localhost:5001/api/login', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json'
-              },
-              body: JSON.stringify({ email, password }),
-              credentials: 'include'
-          });
-  
-          const data = await response.json();
-          console.log('Server response:', data); // Debug log
-          
-          if (!response.ok) {
-              throw new Error(data.message || 'Authentication failed');
-          }
-  
-          // Store user data and return the data
-          if (data.user) {
-              localStorage.setItem('user', JSON.stringify(data.user));
-              return data;
-          } else {
-              throw new Error('No user data received');
-          }
-      } catch (error) {
-          console.error('Authentication error:', error);
-          throw error;
-        }
-    };
-    
-    const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
       e.preventDefault();
       setError('');
       
       try {
-          const response = await authenticateUser(email, password);
-          console.log('Login response:', response);
-          
-          // Store user info in localStorage
-          localStorage.setItem('user', JSON.stringify(response.user));
-          
+          const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password
+          });
+
+          if (error) throw error;
+
+          console.log('Login successful:', data);
           navigate('/dashboard');
+          
       } catch (error) {
-          console.error('Login handler error:', error);
+          console.error('Login error:', error);
           setError(error.message || 'Failed to login. Please check your credentials.');
       }
   };
 
-    const handleSignup = () => {
-        navigate('/signup'); // Redirect to signup form
-    };
+  const handleSignup = () => {
+      navigate('/signup');
+  };
 
     return (
       <PageTransition>
