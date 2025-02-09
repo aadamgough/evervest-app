@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import farmImage from '../logos/farm.jpeg';
 import PageTransition from '../PageTransition';
+import Navbar from '../components/Navbar';
 import '../App.css';
 
 function Home() {
@@ -44,51 +45,9 @@ function Home() {
         </head>
         <body class="body">
           <div id="grain" className="title-container" style={{ position: "relative", overflow: "hidden" }}></div>
-          <div class="navbar w-nav">
-            <div className="nav-container w-container">
-                <Link to="/" className="logo w-nav-brand w--current">
-                  <div className="name-text">
-                    <h1>Evervest</h1>
-                  </div>
-                </Link>
-                <nav role="navigation" className="nav-menu w-nav-menu">
-                  <div className="nav-links" style={{ marginRight: 'auto' }}>
-                    <div className="dropdown">
-                      <Link to="/product" className="nav-text-link">Product</Link>
-                      <div className="dropdown-content">
-                        <Link to="/feature1">Feature 1</Link>
-                        <Link to="/feature2">Feature 2</Link>
-                      </div>
-                    </div>
-                    <div className="dropdown">
-                      <Link to="/solutions" className="nav-text-link">Solutions</Link>
-                      <div className="dropdown-content">
-                        <Link to="/solution1">Solution 1</Link>
-                        <Link to="/solution2">Solution 2</Link>
-                      </div>
-                    </div>
-                    <div className="dropdown">
-                      <Link to="/resources" className="nav-text-link">Resources</Link>
-                      <div className="dropdown-content">
-                        <Link to="/blog">Blog</Link>
-                        <Link to="/faq">FAQ</Link>
-                      </div>
-                    </div>
-                    <Link to="/enterprise" className="nav-text-link">Enterprise</Link>
-                    <Link to="/pricing" className="nav-text-link">Pricing</Link>
-                  </div>
-                  <div className="nav-actions" style={{ marginLeft: 'auto' }}>
-                    <Link to="/contact-sales" className="nav-action-link">Contact Sales</Link>
-                    <Link to="/login" className="nav-action-link">Login</Link>
-                    <Link to="/signup" className="signup-button">Sign up</Link>
-                  </div>
-                </nav>
-            </div>
-            <div class="w-nav-overlay"></div>
-          </div>
+            <Navbar isLoggedIn={false} />
           <section className="hero-wrapper">
             <div className="hero-content-container">
-              {/* Left side - Login content */}
               <div className="hero-left">
                 <div className="hero-text-container">
                   <h1 className="hero-text">
@@ -106,13 +65,13 @@ function Home() {
                   <div className="input-wrapper">
                     <input 
                       type="email" 
-                      placeholder="Enter your email" 
+                      placeholder="Email" 
                       className="email-input"
                       onChange={(e) => setEmail(e.target.value)}
                     />
                     <input 
                       type="password" 
-                      placeholder="Enter your password" 
+                      placeholder="Password" 
                       className="password-input"
                       onChange={(e) => setPassword(e.target.value)}
                     />

@@ -6,7 +6,6 @@ import '../styles/QuestionnaireLayout.css';
 const QuestionnaireLayout = ({ questions, onComplete, title }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  const navigate = useNavigate();
 
   const handleAnswer = (value) => {
     setAnswers({
