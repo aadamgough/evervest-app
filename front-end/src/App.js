@@ -7,6 +7,7 @@ import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import InvestmentPlan from './pages/InvestmentPlan';
 import Questionnaire from './pages/Questionnaire';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
 import RiskToleranceQuestionnaire from './pages/RiskToleranceQuestionnaire';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/questionnaire" element={<Questionnaire />} />
+        <Route path = "/investmentplan" element={<InvestmentPlan/>} />
         <Route path="/questionnaire/wealth" element={<WealthQuestionnaire />} />
         <Route path="/questionnaire/risk" element={<RiskToleranceQuestionnaire />} />
         <Route path="/questionnaire/esg" element={<ESGQuestionnaire />} />

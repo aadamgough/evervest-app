@@ -8,7 +8,7 @@ import '../App.css';
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState();
     
     // Get today's date in a nice format
     const today = new Date().toLocaleDateString('en-US', {
@@ -53,21 +53,7 @@ function Dashboard() {
         getUser();
     }, [navigate]);
 
-    const handleLogout = async () => {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-            
-            navigate('/');
-        } catch (error) {
-            console.error('Error logging out:', error);
-        }
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
+    
     return (
         <PageTransition>
         <div className="Dashboard">
@@ -126,7 +112,7 @@ function Dashboard() {
                         </div>
                         <button 
                             className="dashboard-btn"
-                            onClick={() => navigate('/HandleQuestionnaireSubmission')}
+                            onClick={() => navigate('/InvestmentPlan')}
                         >
                             Generate Investment Plan
                         </button>

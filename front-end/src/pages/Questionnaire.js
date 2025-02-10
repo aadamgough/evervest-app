@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
-import { IoArrowBack } from 'react-icons/io5'; // Install with: npm install react-icons
 import '../App.css';
 
 function Questionnaire() {
@@ -18,14 +17,6 @@ function Questionnaire() {
 
             {/* Main Content */}
             <div className="questionnaire-content">
-                {/* Back Button */}
-                <div className="back-button-container">
-                    <button 
-                        onClick={() => navigate('/dashboard')} 
-                        className="back-button"
-                    >
-                    </button>
-                </div>
                 <div className="questionnaire-content-inner">
                     <h1>
                         Discover your ideal investment strategy through our custom questionnaires
