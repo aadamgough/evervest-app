@@ -203,7 +203,7 @@ const wealthQuestions = [
         return () => subscription.unsubscribe();
     }, [navigate]);
 
-    const handleComplete = async (answers) => {
+    const handleComplete = async (wmq_answers) => {
         if (!user) {
         setError('Please log in to submit the questionnaire');
         navigate('/');
@@ -217,7 +217,7 @@ const wealthQuestions = [
         // Create submission object using authenticated user ID
         const submission = {
             user_id: user.id,
-            answers: answers,
+            wmq_answers: wmq_answers,
         };
 
         // Insert with RLS policies in place

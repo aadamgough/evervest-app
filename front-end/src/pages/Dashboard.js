@@ -96,7 +96,7 @@ function Dashboard() {
                         </div>
                         <button 
                             className="dashboard-btn"
-                            onClick={() => {/* Add navigation logic */}}
+                            onClick={() => navigate('/responses')}
                         >
                             View my Responses
                         </button>

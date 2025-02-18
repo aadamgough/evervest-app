@@ -33,10 +33,6 @@ const Navbar = ({ isLoggedIn }) => {
                                 </div>
                                 <div className="dropdown">
                                     <Link to="/solutions" className="nav-text-link">Investments</Link>
-                                    <div className="dropdown-content">
-                                        <Link to="/solution1">Portfolio 1</Link>
-                                        <Link to="/solution2">Portfolio 2</Link>
-                                    </div>
                                 </div>
                                 <div className="dropdown">
                                     <Link to="/resources" className="nav-text-link">Profile</Link>
@@ -60,17 +56,9 @@ const Navbar = ({ isLoggedIn }) => {
                             <div className="nav-links" style={{ marginRight: 'auto' }}>
                                 <div className="dropdown">
                                     <Link to="/product" className="nav-text-link">Product</Link>
-                                    <div className="dropdown-content">
-                                        <Link to="/feature1">Feature 1</Link>
-                                        <Link to="/feature2">Feature 2</Link>
-                                    </div>
                                 </div>
                                 <div className="dropdown">
                                     <Link to="/solutions" className="nav-text-link">Solutions</Link>
-                                    <div className="dropdown-content">
-                                        <Link to="/solution1">Solution 1</Link>
-                                        <Link to="/solution2">Solution 2</Link>
-                                    </div>
                                 </div>
                                 <div className="dropdown">
                                     <Link to="/resources" className="nav-text-link">Resources</Link>
