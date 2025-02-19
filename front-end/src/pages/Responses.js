@@ -71,10 +71,11 @@ function Responses() {
                 <div className="dashboard-content">
                     <div className="welcome-section">
                         <h1>Questionnaire Responses for {user?.name}</h1>
+                        <p className="subtitle">Review and manage your investment profile responses</p>
                     </div>
 
                     <div className="action-buttons-container">
-                        <div className="action-item" onClick={() => handleResponseClick('wmq_answers')}>
+                        <div onClick={() => handleResponseClick('wmq_answers')}>
                             <ResponsePreview 
                                 title="Wealth Management"
                                 data={responses.wmq_answers}
@@ -82,7 +83,7 @@ function Responses() {
                             />
                         </div>
 
-                        <div className="action-item" onClick={() => handleResponseClick('risktol_answers')}>
+                        <div onClick={() => handleResponseClick('risktol_answers')}>
                             <ResponsePreview 
                                 title="Risk Tolerance"
                                 data={responses.risktol_answers}
@@ -90,7 +91,7 @@ function Responses() {
                             />
                         </div>
 
-                        <div className="action-item" onClick={() => handleResponseClick('esg_answers')}>
+                        <div onClick={() => handleResponseClick('esg_answers')}>
                             <ResponsePreview 
                                 title="ESG Philosophy"
                                 data={responses.esg_answers}

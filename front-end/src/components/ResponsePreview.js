@@ -1,48 +1,52 @@
 import React from 'react';
+import wealthIcon from '../logos/mountain.jpg';  // You'll need to add these images
+import riskIcon from '../logos/bridge.jpg';
+import esgIcon from '../logos/monkey.jpg';
+import '../App.css';
 
 function ResponsePreview({ title, data, completed }) {
-    // Debug log to see what data we're receiving
-    console.log(`${title} data:`, data);
+    const getPreviewImage = () => {
+        switch(title) {
+            case 'Wealth Management':
+                return wealthIcon;
+            case 'Risk Tolerance':
+                return riskIcon;
+            case 'ESG Philosophy':
+                return esgIcon;
+            default:
+                return null;
+        }
+    };
 
-    // Check if data exists and is not null
-    const isCompleted = data !== null && data !== undefined;
-
-    const getPreviewContent = () => {
-        if (!isCompleted) return [];
-        try {
-            // Parse the data if it's a string
-            const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
-            return Object.entries(parsedData).slice(0, 3);
-        } catch (error) {
-            console.error('Error parsing data:', error);
-            return [];
+    const getPreviewDescription = () => {
+        switch(title) {
+            case 'Wealth Management':
+                return 'Your wealth management preferences and financial goals.';
+            case 'Risk Tolerance':
+                return 'Your risk tolerance profile and investment comfort level.';
+            case 'ESG Philosophy':
+                return 'Your environmental, social, and governance investment priorities.';
+            default:
+                return '';
         }
     };
 
     return (
-        <div className="response-preview">
-            <div className="preview-header">
-                <h3>{title}</h3>
-                <span className={`status-badge ${isCompleted ? 'completed' : 'incomplete'}`}>
-                    {isCompleted ? 'Completed' : 'Not Started'}
-                </span>
-            </div>
-            
-            {isCompleted && (
-                <div className="preview-content">
-                    <div className="preview-window">
-                        {getPreviewContent().map(([_, answer], index) => (  // Use _ to ignore the index key
-                            <div key={index} className="preview-answer">
-                                <span className="answer-dot"></span>
-                                <div className="answer-content">
-                                    <p className="answer-text">{answer}</p>
-                                </div>
-                            </div>
-                        ))}
-                        <div className="preview-fade"></div>
-                    </div>
+        <div className="response-card">
+            <div className="card-image-container">
+                <img 
+                    src={getPreviewImage()} 
+                    alt={title} 
+                    className="card-image"
+                />
+                <div className="completion-badge">
+                    {completed ? 'Completed' : 'Not Started'}
                 </div>
-            )}
+            </div>
+            <div className="card-content">
+                <h3 className="card-title">{title}</h3>
+                <p className="card-description">{getPreviewDescription()}</p>
+            </div>
         </div>
     );
 }
