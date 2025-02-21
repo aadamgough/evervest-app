@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import '../App.css';
+import LlamaAI from 'llamaai';
 
 function InvestmentPlan() {
     const navigate = useNavigate();
@@ -69,21 +70,13 @@ function InvestmentPlan() {
             }
 
             // Create submission object
-            const submission = {
-                user_id: session.user.id,
-                selected_options: selectedOptions,
-                created_at: new Date()
-            };
+            
 
             // Insert into your database
-            const { error: insertError } = await supabase
-                .from('investment_plans')
-                .insert(submission);
-
-            if (insertError) throw insertError;
+            
 
             // Navigate to results or confirmation page
-            navigate('/investment-results');
+            navigate('/investments');
 
         } catch (error) {
             console.error('Error generating plan:', error);

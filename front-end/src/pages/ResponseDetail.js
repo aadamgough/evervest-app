@@ -80,11 +80,13 @@ function ResponseDetail() {
         <PageTransition>
             <div className="ResponseDetail">
                 <Navbar isLoggedIn={true} />
+                <div className="detail-header">
+                        <button className="back-button" onClick={() => navigate('/responses')}>
+                            ← Responses
+                        </button>
+                    </div>
                 <div className="detail-content">
                     <div className="detail-header">
-                        <button className="back-button" onClick={() => navigate('/responses')}>
-                            ← Back to Responses
-                        </button>
                         <h1>{getQuestionnaireTitle()}</h1>
                     </div>
 

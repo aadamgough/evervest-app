@@ -2,6 +2,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "framer-motion": "^11.15.0",
+    "llamaai": "^1.0.4",
     "supabase": "^2.6.8"
   }
 }

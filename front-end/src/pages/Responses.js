@@ -67,7 +67,11 @@ function Responses() {
         <PageTransition>
             <div className="Responses">
                 <Navbar isLoggedIn={true} />
-                
+                <div className="detail-header">
+                    <button className="back-button" onClick={() => navigate('/dashboard')}>
+                        ← Home
+                    </button>
+                </div>
                 <div className="dashboard-content">
                     <div className="welcome-section">
                         <h1>Questionnaire Responses for {user?.name}</h1>

@@ -650,14 +650,13 @@ body {
 }
 
 .detail-header {
-  margin-bottom: 2rem;
   text-align: center;
 }
 
 .back-button {
   position: absolute;
   left: 2rem;
-  padding: 0.5rem 1rem;
+  padding: 1rem 1rem;
   background: none;
   border: none;
   color: #2E4636;
