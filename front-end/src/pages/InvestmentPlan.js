@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import '../App.css';
-import LlamaAI from 'llamaai';
 
 function InvestmentPlan() {
     const navigate = useNavigate();
@@ -61,7 +60,6 @@ function InvestmentPlan() {
         }
 
         try {
-            // Get the current session
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError) throw sessionError;
@@ -69,13 +67,54 @@ function InvestmentPlan() {
                 throw new Error('No user logged in');
             }
 
-            // Create submission object
-            
+            // Get questionnaire responses based on selected options
+            const { data: responses } = await supabase
+                .from('questionnaire_responses')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
 
-            // Insert into your database
-            
+            // Validate that selected questionnaires are completed
+            if (selectedOptions.wealthManagement && !responses?.wmq_answers) {
+                setError('Please complete the Wealth Management questionnaire first');
+                return;
+            }
+            if (selectedOptions.riskTolerance && !responses?.risktol_answers) {
+                setError('Please complete the Risk Tolerance questionnaire first');
+                return;
+            }
+            if (selectedOptions.esgPhilosophy && !responses?.esg_answers) {
+                setError('Please complete the ESG Philosophy questionnaire first');
+                return;
+            }
 
-            // Navigate to results or confirmation page
+            // Call backend with selected options and responses
+            const response = await fetch('http://localhost:5001/api/generate-plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: session.user.id,
+                    selectedOptions: selectedOptions,  // Pass the selected options
+                    questionnaire_responses: {
+                        // Only include selected questionnaire responses
+                        ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
+                        ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),
+                        ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to generate plan');
+            }
+
+            const data = await response.json();
+            console.log('Generated plan:', data);
+
+            // Navigate to investments page
             navigate('/investments');
 
         } catch (error) {

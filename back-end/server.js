@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const { createClient } = require('@supabase/supabase-js'); // Change to require syntax
+const { createClient } = require('@supabase/supabase-js');
 
 // Environment variables should be in a .env file
 require('dotenv').config();
@@ -13,6 +13,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Llama API setup
+const LLAMA_API_KEY = process.env.LLAMA_API_KEY;
+
 // Middleware
 app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -23,9 +26,6 @@ app.use(express.json());
 // Add this test endpoint
 app.get('/api/test-db', async (req, res) => {
     try {
-        console.log('Testing Supabase connection...');
-        console.log('Supabase URL:', process.env.SUPABASE_URL);
-        console.log('Supabase Key exists:', !!process.env.SUPABASE_KEY);
 
         const { data, error } = await supabase
             .from('users')
@@ -145,6 +145,97 @@ app.post('/api/login', async (req, res) => {
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.post('api/generate-plan', async (req, res) => {
+    try {
+        const { user_id, selectedOptions, questionnaire_responses } = req.body;
+
+        //validate request date
+        if (!user_id || !selectedOptions){
+            return res.status(400).json({
+                message: 'Missing required data'
+            });
+        }
+
+        //Format the prompt based on selected options and their repsonses
+        let prompt = 'I am a financial advisor seeking an optimized investment plan for a client based ' +
+        'on their financial situation, risk tolerance, and investment goals. ' +
+        'Provide a strategic investmnet plan for the client, including allocation ' +
+        'percentages, accounts they should open, and reasoning.';
+
+        if (selectedOptions.wealthManagement && questionnaire_responses?.wmq_answers) {
+            prompt += "Wealth Management Responses:\n";
+            Object.entries(questionnaire_responses.wmq_answers).forEach(([question, answer]) => {
+                prompt += `${question}: ${answer}\n`;
+            });
+        }
+
+        if (selectedOptions.riskTolerance && questionnaire_responses?.risktol_answers) {
+            prompt += "\nRisk Tolerance Responses:\n";
+            Object.entries(questionnaire_responses.risktol_answers).forEach(([question, answer]) => {
+                prompt += `${question}: ${answer}\n`;
+            });
+        }
+
+        if (selectedOptions.esgPhilosophy && questionnaire_responses?.esg_answers) {
+            prompt += "\nESG Philosophy Responses:\n";
+            Object.entries(questionnaire_responses.esg_answers).forEach(([question, answer]) => {
+                prompt += `${question}: ${answer}\n`;
+            });
+        }
+
+        // Make request to Llama API
+        const llamaResponse = await fetch('https://api.llama.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${LLAMA_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: "llama3.1-8b",
+                messages: [{
+                    role: "user",
+                    content: prompt
+                }],
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+
+        if (!llamaResponse.ok) {
+            throw new Error('Failed to generate plan from Llama API');
+        }
+
+        const planData = await llamaResponse.json();
+
+        // Store the plan and selected options in Supabase
+        const { error: insertError } = await supabase
+            .from('investment_plans')
+            .insert({
+                user_id: user_id,
+                selected_options: selectedOptions,
+                plan_details: planData.choices[0].message.content,
+                created_at: new Date().toISOString()
+            });
+
+        if (insertError) {
+            console.error('Supabase insert error:', insertError);
+            throw new Error('Failed to save investment plan');
+        }
+
+        res.status(200).json({
+            message: 'Investment plan generated successfully',
+            plan: planData.choices[0].message.content
+        });
+        
+    } catch (error){
+        console.log('Error generating investment plan')
+        res.status(500).json({
+            message: "Failed to generate investment plans",
+            error: error.message
+        });
     }
 });
 

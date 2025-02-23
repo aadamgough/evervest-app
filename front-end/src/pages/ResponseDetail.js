@@ -54,7 +54,7 @@ function ResponseDetail() {
         fetchResponses();
     }, [type, navigate]);
 
-    const handleAnswerUpdate = async (question, newAnswer) => {
+    const handleAnswerUpdate = async (question, newAnswer) => { //HAVEN'T CHECKED IF THIS WORKS
         try {
             const { data: { session } } = await supabase.auth.getSession();
             const updatedResponses = { ...responses, [question]: newAnswer };
