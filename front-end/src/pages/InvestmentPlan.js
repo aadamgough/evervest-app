@@ -88,7 +88,9 @@ function InvestmentPlan() {
                 return;
             }
 
-            // Call backend with selected options and responses
+            
+            console.log('abt to send REQUEST');
+
             const response = await fetch('http://localhost:5001/api/generate-plan', {
                 method: 'POST',
                 headers: {
@@ -106,10 +108,14 @@ function InvestmentPlan() {
                 })
             });
 
+            console.log('Raw response received:', response);
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to generate plan');
             }
+
+    
 
             const data = await response.json();
             console.log('Generated plan:', data);

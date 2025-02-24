@@ -148,12 +148,15 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-app.post('api/generate-plan', async (req, res) => {
+app.post('/api/generate-plan', async (req, res) => {
     try {
+        console.log('Received request body:', req.body);
         const { user_id, selectedOptions, questionnaire_responses } = req.body;
 
         //validate request date
         if (!user_id || !selectedOptions){
+            console.log('Missing required data');
+            console.log('Missing required data:', { user_id, selectedOptions });
             return res.status(400).json({
                 message: 'Missing required data'
             });
@@ -164,37 +167,42 @@ app.post('api/generate-plan', async (req, res) => {
         'on their financial situation, risk tolerance, and investment goals. ' +
         'Provide a strategic investmnet plan for the client, including allocation ' +
         'percentages, accounts they should open, and reasoning.';
+        try {
+            if (selectedOptions.wealthManagement && questionnaire_responses?.wmq_answers) {
+                prompt += "Wealth Management Responses:\n";
+                Object.entries(questionnaire_responses.wmq_answers).forEach(([question, answer]) => {
+                    prompt += `${question}: ${answer}\n`;
+                });
+            }
 
-        if (selectedOptions.wealthManagement && questionnaire_responses?.wmq_answers) {
-            prompt += "Wealth Management Responses:\n";
-            Object.entries(questionnaire_responses.wmq_answers).forEach(([question, answer]) => {
-                prompt += `${question}: ${answer}\n`;
-            });
-        }
+            if (selectedOptions.riskTolerance && questionnaire_responses?.risktol_answers) {
+                prompt += "\nRisk Tolerance Responses:\n";
+                Object.entries(questionnaire_responses.risktol_answers).forEach(([question, answer]) => {
+                    prompt += `${question}: ${answer}\n`;
+                });
+            }
 
-        if (selectedOptions.riskTolerance && questionnaire_responses?.risktol_answers) {
-            prompt += "\nRisk Tolerance Responses:\n";
-            Object.entries(questionnaire_responses.risktol_answers).forEach(([question, answer]) => {
-                prompt += `${question}: ${answer}\n`;
-            });
-        }
-
-        if (selectedOptions.esgPhilosophy && questionnaire_responses?.esg_answers) {
-            prompt += "\nESG Philosophy Responses:\n";
-            Object.entries(questionnaire_responses.esg_answers).forEach(([question, answer]) => {
-                prompt += `${question}: ${answer}\n`;
-            });
+            if (selectedOptions.esgPhilosophy && questionnaire_responses?.esg_answers) {
+                prompt += "\nESG Philosophy Responses:\n";
+                Object.entries(questionnaire_responses.esg_answers).forEach(([question, answer]) => {
+                    prompt += `${question}: ${answer}\n`;
+                });
+            }
+            console.log('Generated prompt:', prompt);
+        } catch (error) {
+            console.error('Error formatting prompt:', error);
+            throw new Error('Failed to format questionnaire data');
         }
 
         // Make request to Llama API
-        const llamaResponse = await fetch('https://api.llama.ai/v1/chat/completions', {
+        const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${LLAMA_API_KEY}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: "llama3.1-8b",
+                model: "llama3.2-3b",
                 messages: [{
                     role: "user",
                     content: prompt
@@ -203,12 +211,10 @@ app.post('api/generate-plan', async (req, res) => {
                 max_tokens: 2000
             })
         });
-
-        if (!llamaResponse.ok) {
-            throw new Error('Failed to generate plan from Llama API');
-        }
+        
 
         const planData = await llamaResponse.json();
+        console.log("after request to llama", planData)
 
         // Store the plan and selected options in Supabase
         const { error: insertError } = await supabase
@@ -231,18 +237,12 @@ app.post('api/generate-plan', async (req, res) => {
         });
         
     } catch (error){
-        console.log('Error generating investment plan')
+        console.log("failure1");
         res.status(500).json({
             message: "Failed to generate investment plans",
             error: error.message
         });
     }
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something broke!' });
 });
 
 app.listen(PORT, () => {
