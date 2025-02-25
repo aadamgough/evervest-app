@@ -216,9 +216,9 @@ const wealthQuestions = [
             // Step 2: Check for existing response with detailed error handling
             const { data: existingResponse, error: fetchError } = await supabase
                 .from('questionnaire_responses')
-                .select('*')  // Select all columns to ensure we get the row if it exists
+                .select('*')  
                 .eq('user_id', user.id)
-                .maybeSingle();  // Use maybeSingle() instead of single() to avoid errors when no row exists
+                .maybeSingle(); 
     
             console.log('Existing response:', existingResponse);
             console.log('Fetch error:', fetchError);

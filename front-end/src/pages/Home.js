@@ -25,6 +25,7 @@ function Home() {
 
           if (error) throw error;
 
+
           console.log('Login successful:', data);
           navigate('/dashboard');
           
@@ -48,6 +49,7 @@ function Home() {
             <Navbar isLoggedIn={false} />
           <section className="hero-wrapper">
             <div className="hero-content-container">
+
               <div className="hero-left">
                 <div className="hero-text-container">
                   <h1 className="hero-text">

@@ -53,11 +53,6 @@ function InvestmentPlan() {
     };
 
     const handleGeneratePlan = async () => {
-        // Check if at least one option is selected
-        if (!Object.values(selectedOptions).some(value => value)) {
-            setError('Please select at least one option');
-            return;
-        }
 
         try {
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -90,16 +85,27 @@ function InvestmentPlan() {
 
             
             console.log('abt to send REQUEST');
-
+            console.log("token", session.access_token);
+            console.log('Request body:', {
+                user_id: session.user.id,
+                selectedOptions: selectedOptions,
+                questionnaire_responses: {
+                    ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
+                    ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),
+                    ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
+                }
+            });
+    
             const response = await fetch('http://localhost:5001/api/generate-plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({
                     user_id: session.user.id,
-                    selectedOptions: selectedOptions,  // Pass the selected options
-                    questionnaire_responses: {
+                    selected_options: selectedOptions,  // Pass the selected options
+                    plan_details: {
                         // Only include selected questionnaire responses
                         ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
                         ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),

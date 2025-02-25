@@ -150,100 +150,145 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/generate-plan', async (req, res) => {
     try {
-        console.log('Received request body:', req.body);
-        const { user_id, selectedOptions, questionnaire_responses } = req.body;
+        // // Extract Bearer token from request headers
+        // const token = req.headers.authorization?.split(' ')[1];
 
-        //validate request date
-        if (!user_id || !selectedOptions){
-            console.log('Missing required data');
+        // if (!token) {
+        //     return res.status(401).json({ message: 'Missing authentication token' });
+        // }
+
+        // // Verify authentication using the token
+        // const { data: { user }, error } = await supabase.auth.getUser(token);
+
+        // if (error || !user) {
+        //     console.error('User is not authenticated:', error);
+        //     return res.status(401).json({ message: 'User is not authenticated' });
+        // }
+
+        // console.log("Authenticated user_id:", user_id);
+
+        // Extract request data
+        console.log("REQ.BODY", req.body)
+        const { user_id, selected_options, plan_details } = req.body;
+
+        // Validate request data
+        if (!user_id || !selected_options) {
             console.log('Missing required data:', { user_id, selectedOptions });
-            return res.status(400).json({
-                message: 'Missing required data'
-            });
+            return res.status(400).json({ message: 'Missing required data' });
         }
 
-        //Format the prompt based on selected options and their repsonses
+        // Format the prompt based on selected options and their responses
         let prompt = 'I am a financial advisor seeking an optimized investment plan for a client based ' +
-        'on their financial situation, risk tolerance, and investment goals. ' +
-        'Provide a strategic investmnet plan for the client, including allocation ' +
-        'percentages, accounts they should open, and reasoning.';
+            'on their financial situation, risk tolerance, and investment goals. ' +
+            'Provide a strategic investment plan for the client, including allocation ' +
+            'percentages, accounts they should open, and reasoning.';
+        
         try {
-            if (selectedOptions.wealthManagement && questionnaire_responses?.wmq_answers) {
+            if (selected_options.wealthManagement && plan_details?.wmq_answers) {
                 prompt += "Wealth Management Responses:\n";
-                Object.entries(questionnaire_responses.wmq_answers).forEach(([question, answer]) => {
+                Object.entries(plan_details.wmq_answers).forEach(([question, answer]) => {
                     prompt += `${question}: ${answer}\n`;
                 });
             }
 
-            if (selectedOptions.riskTolerance && questionnaire_responses?.risktol_answers) {
+            if (selected_options.riskTolerance && plan_details?.risktol_answers) {
                 prompt += "\nRisk Tolerance Responses:\n";
-                Object.entries(questionnaire_responses.risktol_answers).forEach(([question, answer]) => {
+                Object.entries(plan_details.risktol_answers).forEach(([question, answer]) => {
                     prompt += `${question}: ${answer}\n`;
                 });
             }
 
-            if (selectedOptions.esgPhilosophy && questionnaire_responses?.esg_answers) {
+            if (selected_options.esgPhilosophy && plan_details?.esg_answers) {
                 prompt += "\nESG Philosophy Responses:\n";
-                Object.entries(questionnaire_responses.esg_answers).forEach(([question, answer]) => {
+                Object.entries(plan_details.esg_answers).forEach(([question, answer]) => {
                     prompt += `${question}: ${answer}\n`;
                 });
             }
-            console.log('Generated prompt:', prompt);
         } catch (error) {
             console.error('Error formatting prompt:', error);
             throw new Error('Failed to format questionnaire data');
         }
 
         // Make request to Llama API
-        const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${LLAMA_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: "llama3.2-3b",
-                messages: [{
-                    role: "user",
-                    content: prompt
-                }],
-                temperature: 0.7,
-                max_tokens: 2000
-            })
-        });
-        
+        // const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Authorization': `Bearer ${LLAMA_API_KEY}`,
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         model: "llama3.2-3b",
+        //         messages: [{
+        //             role: "user",
+        //             content: prompt
+        //         }],
+        //         temperature: 0.7,
+        //         max_tokens: 2000
+        //     })
+        // });
 
-        const planData = await llamaResponse.json();
-        console.log("after request to llama", planData)
+        // const planData = await llamaResponse.json();
+        // console.log("after request to llama", planData)
 
         // Store the plan and selected options in Supabase
-        const { error: insertError } = await supabase
-            .from('investment_plans')
-            .insert({
-                user_id: user_id,
-                selected_options: selectedOptions,
-                plan_details: planData.choices[0].message.content,
-                created_at: new Date().toISOString()
-            });
+        // console.log('Inserting data:', {
+        //     user_id: user_id,
+        //     selected_options: selectedOptions,
+        //     plan_details: planData,
+        //     created_at: new Date().toISOString()
+        // });
+
+        const examplePlanDetails = {
+            allocation: {
+                stocks: 60,
+                bonds: 30,
+                cash: 10
+            },
+            recommendations: "Invest in diversified index funds."
+        };
+
+        // // Log the data being inserted
+        // console.log('Inserting example data into investment_plans:', {
+        //     user_id: user_id,
+        //     selected_options: selectedOptions,
+        //     plan_details: examplePlanDetails,
+        //     created_at: new Date().toISOString()
+        // });
+
+        // Insert example data into the investment_plans table
+        const { data, error } = await supabase
+            .from('investment_plan')
+            .insert([
+                {
+                    user_id: req.body.user_id,
+                    selected_options: req.body.selected_options,
+                    plan_details: req.body.plan_details
+                }
+            ]);
+        
+        if (error) {
+            throw error;
+        }
 
         if (insertError) {
-            console.error('Supabase insert error:', insertError);
-            throw new Error('Failed to save investment plan');
+            console.error("Supabase insert error:", insertError);
+            return res.status(500).json({ message: 'Database insert failed', error: insertError });
         }
 
         res.status(200).json({
             message: 'Investment plan generated successfully',
-            plan: planData.choices[0].message.content
+            // plan: planData.choices[0].message.content  // Uncomment this when Llama API is used
         });
-        
-    } catch (error){
-        console.log("failure1");
+
+    } catch (error) {
+        console.error("Error in generate-plan:", error);
         res.status(500).json({
             message: "Failed to generate investment plans",
             error: error.message
         });
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
