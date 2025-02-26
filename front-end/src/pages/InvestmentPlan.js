@@ -53,84 +53,95 @@ function InvestmentPlan() {
     };
 
     const handleGeneratePlan = async () => {
-
         try {
+            // Get session and validate user
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            
             if (sessionError) throw sessionError;
             if (!session?.user?.id) {
                 throw new Error('No user logged in');
             }
-
-            // Get questionnaire responses based on selected options
+    
+            // Log session details for debugging
+            console.log('Session details:', {
+                'User ID': session.user.id,
+                'Token present': !!session.access_token,
+                'Token': session.access_token // Be careful with this in production
+            });
+    
+            // Get questionnaire responses
             const { data: responses } = await supabase
                 .from('questionnaire_responses')
                 .select('*')
                 .eq('user_id', session.user.id)
                 .single();
-
-            // Validate that selected questionnaires are completed
-            if (selectedOptions.wealthManagement && !responses?.wmq_answers) {
-                setError('Please complete the Wealth Management questionnaire first');
-                return;
+    
+            // Validate questionnaire completion
+            const validationErrors = {
+                wealthManagement: selectedOptions.wealthManagement && !responses?.wmq_answers,
+                riskTolerance: selectedOptions.riskTolerance && !responses?.risktol_answers,
+                esgPhilosophy: selectedOptions.esgPhilosophy && !responses?.esg_answers
+            };
+    
+            for (const [type, hasError] of Object.entries(validationErrors)) {
+                if (hasError) {
+                    setError(`Please complete the ${type.replace(/([A-Z])/g, ' $1').trim()} questionnaire first`);
+                    return;
+                }
             }
-            if (selectedOptions.riskTolerance && !responses?.risktol_answers) {
-                setError('Please complete the Risk Tolerance questionnaire first');
-                return;
-            }
-            if (selectedOptions.esgPhilosophy && !responses?.esg_answers) {
-                setError('Please complete the ESG Philosophy questionnaire first');
-                return;
-            }
-
-            
-            console.log('abt to send REQUEST');
-            console.log("token", session.access_token);
-            console.log('Request body:', {
+    
+            // Prepare request body
+            const requestBody = {
                 user_id: session.user.id,
-                selectedOptions: selectedOptions,
-                questionnaire_responses: {
+                selected_options: selectedOptions,
+                plan_details: {
                     ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
                     ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),
                     ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
                 }
+            };
+    
+            // Log request details
+            console.log('Sending request with:', {
+                endpoint: 'http://localhost:5001/api/generate-plan',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer [token-hidden]'
+                },
+                body: requestBody
             });
     
+            // Send request
             const response = await fetch('http://localhost:5001/api/generate-plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify({
-                    user_id: session.user.id,
-                    selected_options: selectedOptions,  // Pass the selected options
-                    plan_details: {
-                        // Only include selected questionnaire responses
-                        ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
-                        ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),
-                        ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
-                    }
-                })
+                body: JSON.stringify(requestBody)
             });
-
-            console.log('Raw response received:', response);
-
+    
+            // Handle response
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to generate plan');
+                console.error('Server response error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorData
+                });
+                throw new Error(errorData.error || 'Failed to generate investment plan');
             }
-
     
-
             const data = await response.json();
-            console.log('Generated plan:', data);
-
+            console.log('Successfully generated plan:', data);
+    
             // Navigate to investments page
             navigate('/investments');
-
+    
         } catch (error) {
-            console.error('Error generating plan:', error);
+            console.error('Error in handleGeneratePlan:', {
+                message: error.message,
+                stack: error.stack
+            });
             setError('Failed to generate investment plan. Please try again.');
         }
     };
