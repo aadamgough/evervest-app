@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PageTransition from '../PageTransition';
 import { supabase } from '../lib/supabaseClient';
 
-
 function Investments() {
-    const { type } = useParams();
     const navigate = useNavigate();
     const [plan, setPlan] = useState(null);
     const [error, setError] = useState(null);
@@ -23,12 +21,15 @@ function Investments() {
 
                 const { data, error } = await supabase
                     .from('investment_plans')
-                    .select(type)
+                    .select('plan_details, created_at')
                     .eq('user_id', session.user.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
                     .single();
 
                 if (error) throw error;
-                setPlan(data[type]);
+                console.log(data.plan_details.generated_plan);
+                setPlan(data.plan_details.generated_plan);
 
             } catch (err) {
                 console.error('Error:', err);
@@ -39,16 +40,54 @@ function Investments() {
         };
 
         fetchInvestmentPlan();
-    }, [type, navigate]);
+    }, [navigate]);
 
+    const formatPlanContent = (planContent) => {
+    // Split the content into sections based on newlines
+    const sections = planContent.split(/\n\s*\n/); // Split on one or more newlines
+
+    return sections.map((section, index) => {
+        if (section.trim().length === 0) return null; // Skip empty sections
+        
+        // Fix this
+        const isHeader = section.toUpperCase() === section || section.includes(':');
+
+        console.log("this is the section",section);
+        
+        return (
+            <div key={index} className="plan-header">
+                {section}
+            </div>
+        );
+    });
+};
 
     return (
         <PageTransition>
-            <div className="Investments">
+            <div className="investments-page">
                 <Navbar isLoggedIn={true} />
-                <div className="content">
-                    <h1>Investments</h1>
-                    {plan}
+                <div className="investments-content">
+                    <h1>Your Investment Plan</h1>
+                    
+                    {loading && (
+                        <div className="loading-spinner">
+                            Loading your investment plan...
+                        </div>
+                    )}
+                    
+                    {error && (
+                        <div className="error-message">
+                            Error loading investment plan: {error}
+                        </div>
+                    )}
+                    
+                    {plan && (
+                        <div className="investment-plan-container">
+                            <div className="plan-card">
+                                {formatPlanContent(plan)}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </PageTransition>
