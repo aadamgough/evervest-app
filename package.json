@@ -1,13 +1,25 @@
 {
+  "name": "evervest-app",
+  "version": "1.0.0",
+  "description": "EverVest Investment Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd client && npm install",
+    "build": "cd client && npm run build"
+  },
   "dependencies": {
-    "axios": "^1.7.9",
+    "@supabase/supabase-js": "^2.x.x",
+    "bcrypt": "^5.x.x",
     "cors": "^2.8.5",
-    "express-session": "^1.18.1",
-    "framer-motion": "^11.15.0",
-    "llamaai": "^1.0.4",
-    "supabase": "^2.6.8"
+    "dotenv": "^16.x.x",
+    "express": "^4.x.x"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "concurrently": "^8.x.x",
+    "nodemon": "^3.x.x"
   }
 }
