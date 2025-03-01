@@ -111,13 +111,22 @@ function InvestmentPlan() {
             });
     
             // Send request
-            const response = await fetch('http://localhost:5002/api/generate-plan', {
+            const response = await fetch('/api/investments/generate-plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // Make sure to include the access token
                     'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    user_id: session.user.id,
+                    selected_options: selectedOptions,
+                    plan_details: {
+                        wmq_answers: wmqAnswers,
+                        risktol_answers: riskTolAnswers,
+                        esg_answers: esgAnswers
+                    }
+                })
             });
     
             // Handle response
