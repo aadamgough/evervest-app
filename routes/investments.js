@@ -13,6 +13,8 @@ router.post('/generate-plan', authenticateUser, async (req, res) => {
     try {
         const { user_id, selected_options, plan_details } = req.body;
 
+        console.log('Received request body:', req.body);
+
         // Verify user_id matches authenticated user
         if (req.user.id !== user_id) {
             return res.status(403).json({ error: 'User ID mismatch' });
@@ -63,6 +65,12 @@ router.post('/generate-plan', authenticateUser, async (req, res) => {
                 max_tokens: 2000
             })
         });
+
+        if (!llamaResponse.ok) {
+            const errorText = await llamaResponse.text();
+            console.error('LLaMA API error:', errorText);
+            return res.status(500).json({ error: 'Failed to generate plan from LLaMA API' });
+        }
 
         const planData = await llamaResponse.json();
 

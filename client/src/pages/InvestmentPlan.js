@@ -12,6 +12,10 @@ function InvestmentPlan() {
         riskTolerance: false,
         esgPhilosophy: false
     });
+    const [wmqAnswers, setWmqAnswers] = useState(null);
+    const [riskTolAnswers, setRiskTolAnswers] = useState(null);
+    const [esgAnswers, setEsgAnswers] = useState(null);
+
     const [error, setError] = useState('');
     const [user, setUser] = useState();
 
@@ -99,6 +103,8 @@ function InvestmentPlan() {
                     ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
                 }
             };
+
+            console.log('Request body:', requestBody); // Debug log
     
             // Log request details
             console.log('Sending request with:', {
@@ -115,18 +121,9 @@ function InvestmentPlan() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Make sure to include the access token
                     'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify({
-                    user_id: session.user.id,
-                    selected_options: selectedOptions,
-                    plan_details: {
-                        wmq_answers: wmqAnswers,
-                        risktol_answers: riskTolAnswers,
-                        esg_answers: esgAnswers
-                    }
-                })
+                body: JSON.stringify(requestBody)
             });
     
             // Handle response
@@ -147,10 +144,7 @@ function InvestmentPlan() {
             navigate('/investments');
     
         } catch (error) {
-            console.error('Error in handleGeneratePlan:', {
-                message: error.message,
-                stack: error.stack
-            });
+            console.error('Error in handleGeneratePlan:', error);
             setError('Failed to generate investment plan. Please try again.');
         }
     };
