@@ -2,7 +2,7 @@
   "name": "evervest-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5002",
+ 
   "dependencies": {
     "@supabase/supabase-js": "^2.x.x",
     "@testing-library/jest-dom": "^5.x.x",

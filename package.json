@@ -12,14 +12,14 @@
     "build": "cd client && npm run build"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.x.x",
+    "@supabase/supabase-js": "^2.49.1",
     "bcrypt": "^5.x.x",
     "cors": "^2.8.5",
-    "dotenv": "^16.x.x",
-    "express": "^4.x.x"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "concurrently": "^8.x.x",
-    "nodemon": "^3.x.x"
+    "nodemon": "^3.1.9"
   }
 }

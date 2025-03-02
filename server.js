@@ -11,6 +11,7 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
     {
         auth: {
             autoRefreshToken: false,
@@ -25,7 +26,9 @@ const PORT = process.env.PORT || 5002;
 // Middleware
 app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 app.use(express.json());
 
