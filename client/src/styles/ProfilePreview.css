@@ -1,0 +1,102 @@
+.profile-preview {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.personal-info {
+    background-color: #f9f9f9;
+    flex: 1;
+}
+
+.linked-accounts {
+    background-color: #f1f1f1;
+    flex: 2;
+}
+
+.linked-accounts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.link-account-btn {
+    background-color: #88494ccf;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.link-account-btn:hover {
+    background-color: #88494c;
+}
+
+.plus-icon {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.accounts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.account-number {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.account-type {
+    background-color: #e0e0e0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    color: #333;
+}
+
+.no-accounts-message {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+}

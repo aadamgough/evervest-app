@@ -34,13 +34,12 @@ const Navbar = ({ isLoggedIn }) => {
                                 <div className="dropdown">
                                     <Link to="/investments" className="nav-text-link">Investments</Link>
                                 </div>
-                                <div className="dropdown">
-                                    <Link to="/resources" className="nav-text-link">Profile</Link>
-                                </div>
                                 <Link to="/questionnaire" className="nav-text-link">Questionnaires</Link>
                             </div>
                             <div className="nav-actions" style={{ marginLeft: 'auto' }}>
-                                <Link to="/contact-sales" className="nav-action-link">Contact Support</Link>
+                                <div className="dropdown">
+                                    <Link to="/profile" className="nav-text-link">Profile</Link>
+                                </div>
                                 <button 
                                     onClick={handleLogout} 
                                     className="signup-button"

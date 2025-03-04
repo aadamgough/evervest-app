@@ -107,4 +107,79 @@ router.post('/login', async (req, res) => {
     }
 });
 
+
+router.post('/exchange-token', async (req, res) => {
+    try {
+        const { code, state } = req.body;
+        
+        // Verify state matches a user ID
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', state)
+            .single();
+            
+        if (userError || !userData) {
+            return res.status(400).json({ error: 'Invalid state parameter' });
+        }
+        
+        // Exchange code for tokens with Schwab API
+        const tokenResponse = await fetch('https://api.schwab.com/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Basic ${Buffer.from(`${process.env.SCHWAB_CLIENT_ID}:${process.env.SCHWAB_CLIENT_SECRET}`).toString('base64')}`
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code,
+                redirect_uri: process.env.REDIRECT_URI || 'http://localhost:3000/auth/callback'
+            })
+        });
+        
+        if (!tokenResponse.ok) {
+            const errorData = await tokenResponse.text();
+            console.error('Token exchange error:', errorData);
+            return res.status(400).json({ error: 'Failed to exchange token' });
+        }
+        
+        const tokens = await tokenResponse.json();
+        
+        // Get account information
+        const accountsResponse = await fetch('https://api.schwab.com/v1/accounts', {
+            headers: {
+                'Authorization': `Bearer ${tokens.access_token}`
+            }
+        });
+        
+        if (!accountsResponse.ok) {
+            return res.status(400).json({ error: 'Failed to fetch account information' });
+        }
+        
+        const accounts = await accountsResponse.json();
+        
+        // Store account information in database
+        for (const account of accounts.accounts) {
+            await supabase.from('linked_brokerage_accounts').insert({
+                user_id: state,
+                provider: 'Schwab',
+                account_id: account.account_id,
+                account_name: account.nickname || `Schwab ${account.account_type}`,
+                account_type: account.account_type,
+                account_number_last4: account.mask,
+                access_token: tokens.access_token, // In production, encrypt this
+                refresh_token: tokens.refresh_token, // In production, encrypt this
+                token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+                metadata: account
+            });
+        }
+        
+        res.status(200).json({ success: true });
+        
+    } catch (error) {
+        console.error('Token exchange error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router;
