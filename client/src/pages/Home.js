@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
@@ -14,28 +13,7 @@ function Home() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Check for existing session on component mount
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          navigate('/dashboard');
-        }
-      } catch (error) {
-        console.error('Session check error:', error);
-      } finally {
-        setInitializing(false); // Set initializing to false when done
-      }
-    };
-    checkSession();
-  }, [navigate]);
-
-  // Don't render anything while checking session
-  if (initializing) {
-    return <div>Loading...</div>;
-  }
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -80,6 +58,32 @@ function Home() {
   const handleSignup = () => {
     navigate('/signup');
   };
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      } finally {
+        setInitializing(false);
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
+  // Show loading state while checking session
+  if (initializing) {
+    return (
+      <div className="loading-container">
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <PageTransition>
