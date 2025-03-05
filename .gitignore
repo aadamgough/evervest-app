@@ -3,6 +3,8 @@
 client/.env
 .env.local
 .env.*
+.env.test
+.env.production
 
 # Dependencies
 node_modules/
