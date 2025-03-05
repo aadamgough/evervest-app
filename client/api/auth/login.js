@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
 
 // Add console.log to debug environment variables
-console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_ANON_KEY);
+console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
 
 if (!process.env.REACT_APP_SUPABASE_URL || !process.env.REACT_APP_SUPABASE_ANON_KEY) {
