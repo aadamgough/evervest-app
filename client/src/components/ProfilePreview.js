@@ -2,17 +2,30 @@ import React from 'react';
 import '../styles/ProfilePreview.css';
 
 function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
-    const handleLinkAccount = () => {
-        // This will be replaced with actual OAuth flow
-        const schwabAuthUrl = "https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id=1wzwOrhivb2PkR1UCAUVTKYqC4MTNYlj&scope=readonly&redirect_uri=https://developer.schwab.com/oauth2-redirect.html";
-        const clientId = process.env.REACT_APP_SCHWAB_CLIENT_ID;
-        const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI || "http://localhost:3000/auth/callback");
-        const scope = encodeURIComponent("accounts transactions");
-        
-        const authorizationUrl = `${schwabAuthUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${user.id}`;
-        
-        // Open OAuth window
-        window.open(authorizationUrl, "_blank", "width=800,height=600");
+    const handleLinkAccount = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            const response = await fetch('/api/auth/exchange-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    code: authorizationCode,
+                    state: session.user.id
+                })
+            });
+    
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            
+            // Handle successful account linking
+            // Update UI, show success message, etc.
+        } catch (error) {
+            console.error('Error linking account:', error);
+        }
     };
 
     return (

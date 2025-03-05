@@ -20,42 +20,21 @@ function Signup() {
         setIsLoading(true);
 
         try {
-            // First, create the auth user
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        name: name // Store name in auth metadata
-                    }
-                }
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, password })
             });
-
-            if (authError) throw authError;
-
-            if (authData.user) {
-                // Then create the profile in users table
-                const { error: profileError } = await supabase
-                    .from('users')
-                    .insert([
-                        {
-                            id: authData.user.id,
-                            name: name,
-                            email: email
-                        }
-                    ]);
-
-                if (profileError) throw profileError;
-
-                console.log('Signup successful:', authData);
-                navigate('/dashboard');
-            }
-
+            
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            
+            // Handle successful signup
+            // Redirect to login, show success message, etc.
         } catch (error) {
             console.error('Signup error:', error);
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
         }
     };
 

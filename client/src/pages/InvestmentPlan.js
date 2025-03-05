@@ -117,7 +117,7 @@ function InvestmentPlan() {
             });
     
             // Send request
-            const response = await fetch('http://localhost:5002/api/investments/generate-plan', {
+            const response = await fetch('/api/investments/generate-plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
