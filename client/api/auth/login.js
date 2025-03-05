@@ -30,27 +30,33 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: 'Please provide email and password' });
         }
 
-        const { data: user, error: findError } = await supabase
+        // Use Supabase's built-in auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            console.error('Supabase auth error:', error);
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Get additional user data if needed
+        const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('id, name, email, password')
-            .eq('email', email)
+            .select('id, name, email')
+            .eq('id', data.user.id)
             .single();
 
-        if (findError) {
-            return res.status(401).json({ message: 'Invalid email or password' });
+        if (userError) {
+            console.error('User data fetch error:', userError);
+            return res.status(500).json({ message: 'Error fetching user data' });
         }
-
-        const validPassword = await bcrypt.compare(password, user.password);
-
-        if (!validPassword) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
-
-        const { password: _, ...userWithoutPassword } = user;
 
         return res.status(200).json({
             message: 'Login successful',
-            user: userWithoutPassword
+            user: userData,
+            session: data.session
         });
     } catch (error) {
         console.error('Login error:', error);
