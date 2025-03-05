@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
+console.log('LLAMA API Key exists:', !!process.env.LLAMA_API_KEY);
+
 // Add console.log to debug environment variables
 console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
@@ -48,6 +50,10 @@ export default async function handler(req, res) {
 
     try {
         // Verify authentication
+        if (!process.env.LLAMA_API_KEY) {
+            console.error('LLAMA API Key is missing');
+            return res.status(500).json({ error: 'LLAMA API configuration is missing' });
+        }
         const user = await verifyAuth(req);
         const { user_id, selected_options, plan_details } = req.body;
 

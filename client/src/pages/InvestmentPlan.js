@@ -12,9 +12,6 @@ function InvestmentPlan() {
         riskTolerance: false,
         esgPhilosophy: false
     });
-    const [wmqAnswers, setWmqAnswers] = useState(null);
-    const [riskTolAnswers, setRiskTolAnswers] = useState(null);
-    const [esgAnswers, setEsgAnswers] = useState(null);
 
     const [error, setError] = useState('');
     const [user, setUser] = useState();
