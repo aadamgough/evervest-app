@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import farmImage from '../logos/farm.jpeg';
@@ -17,13 +17,24 @@ function Home() {
   // Check for existing session on component mount
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/dashboard');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      } finally {
+        setInitializing(false); // Set initializing to false when done
       }
     };
     checkSession();
   }, [navigate]);
+
+  // Don't render anything while checking session
+  if (initializing) {
+    return <div>Loading...</div>;
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
