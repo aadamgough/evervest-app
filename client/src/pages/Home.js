@@ -14,6 +14,17 @@ function Home() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/dashboard');
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -31,6 +42,18 @@ function Home() {
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
+      }
+
+        // Set the session in Supabase client
+      if (data.session) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token
+        });
+
+        if (sessionError) {
+          throw new Error('Failed to set session');
+        }
       }
 
       // Handle successful login
