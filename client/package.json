@@ -2,12 +2,12 @@
   "name": "evervest-client",
   "version": "0.1.0",
   "private": true,
- 
   "dependencies": {
-    "@supabase/supabase-js": "^2.x.x",
+    "@supabase/supabase-js": "^2.49.1",
     "@testing-library/jest-dom": "^5.x.x",
     "@testing-library/react": "^13.x.x",
     "@testing-library/user-event": "^13.x.x",
+    "bcrypt": "^5.1.1",
     "framer-motion": "^12.4.7",
     "react": "^18.x.x",
     "react-dom": "^18.x.x",
