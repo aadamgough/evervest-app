@@ -27,7 +27,10 @@ function Home() {
         });
         
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
+      }
+
         
         // Handle successful login
         // Update user state, redirect, etc.
@@ -40,17 +43,16 @@ function Home() {
       navigate('/signup');
   };
 
-    return (
-      <PageTransition>
+  return (
+    <PageTransition>
       <div className="Home">
         <head>
         </head>
-        <body class="body">
+        <body className="body">
           <div id="grain" className="title-container" style={{ position: "relative", overflow: "hidden" }}></div>
-            <Navbar isLoggedIn={false} />
+          <Navbar isLoggedIn={false} />
           <section className="hero-wrapper">
             <div className="hero-content-container">
-
               <div className="hero-left">
                 <div className="hero-text-container">
                   <h1 className="hero-text">
@@ -65,26 +67,41 @@ function Home() {
                   </p>
                 </div>
                 <div className="email-pass-container">
+                  {error && (
+                    <div className="error-message">
+                      ⚠️ {error}
+                    </div>
+                  )}
                   <div className="input-wrapper">
                     <input 
                       type="email" 
                       placeholder="Email" 
                       className="email-input"
                       onChange={(e) => setEmail(e.target.value)}
+                      value={email}
                     />
                     <input 
                       type="password" 
                       placeholder="Password" 
                       className="password-input"
                       onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                     />
                   </div>
                 </div>
                 <div className="sign-log-in-container">
                   <div className="auth-buttons">
-                    <button className="auth-btn login-btn" onClick={handleLogin}>Log In</button>
+                    <button 
+                      className={`auth-btn login-btn ${loading ? 'loading' : ''}`} 
+                      onClick={handleLogin}
+                      disabled={loading}
+                    >
+                      {loading ? 'Logging in...' : 'Log In'}
+                    </button>
                     <span className="auth-divider">or</span>
-                    <button className="auth-btn signup-btn" onClick={handleSignup}>Sign Up</button>
+                    <button className="auth-btn signup-btn" onClick={handleSignup}>
+                      Sign Up
+                    </button>
                   </div>
                 </div>
               </div>
@@ -97,11 +114,10 @@ function Home() {
               </div>
             </div>
           </section>
-        
-      </body>
+        </body>
       </div>
-      </PageTransition>
-    );
+    </PageTransition>
+  );
   }
   
   export default Home;

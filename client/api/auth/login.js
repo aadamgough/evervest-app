@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
 
+// Add console.log to debug environment variables
+console.log('Supabase URL:', process.env.SUPABASE_URL);
+console.log('Supabase Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Missing Supabase environment variables');
+}
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
