@@ -2,16 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
 
 // Add console.log to debug environment variables
-console.log('Supabase URL:', process.env.SUPABASE_URL);
-console.log('Supabase Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_ANON_KEY);
+console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
 
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+if (!process.env.REACT_APP_SUPABASE_URL || !process.env.REACT_APP_SUPABASE_ANON_KEY) {
     throw new Error('Missing Supabase environment variables');
 }
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    process.env.REACT_APP_SUPABASE_ANON_KEY
 );
 
 export default async function handler(req, res) {
