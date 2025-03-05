@@ -12,35 +12,39 @@ function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
-      e.preventDefault();
-      setError('');
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
       
-      try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || 'Login failed');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
 
-        
-        // Handle successful login
-        // Update user state, redirect, etc.
+      // Handle successful login
+      navigate('/dashboard'); // or wherever you want to redirect
     } catch (error) {
-        console.error('Login error:', error);
+      console.error('Login error:', error);
+      setError(error.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignup = () => {
-      navigate('/signup');
+    navigate('/signup');
   };
 
   return (
@@ -118,6 +122,6 @@ function Home() {
       </div>
     </PageTransition>
   );
-  }
-  
-  export default Home;
+}
+
+export default Home;
