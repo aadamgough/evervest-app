@@ -19,39 +19,42 @@ function Dashboard() {
     });
 
     useEffect(() => {
-        // Check for authenticated user and fetch their data
-        const getUser = async () => {
-            try {
-                // Get the current session
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                
-                if (sessionError) throw sessionError;
-
-                if (!session) {
-                    navigate('/');
-                    return;
-                }
-
-                // Fetch user profile from your users table
-                const { data: userData, error: userError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single();
-
-                if (userError) throw userError;
-
-                setUser(userData);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-                navigate('/');
-            } finally {
-                setLoading(false);
+        const checkAuth = async () => {
+          try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (error) throw error;
+            
+            if (!session) {
+              // No valid session, redirect to home
+              navigate('/');
+              return;
             }
+    
+            // Get user data
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+    
+            if (userError) throw userError;
+            
+            setUser(userData);
+          } catch (error) {
+            console.error('Auth error:', error);
+            navigate('/');
+          } finally {
+            setLoading(false);
+          }
         };
-
-        getUser();
-    }, [navigate]);
+    
+        checkAuth();
+      }, [navigate]);
+    
+      if (loading) {
+        return <div>Loading...</div>;
+      }
 
     
     return (
