@@ -47,9 +47,8 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
 
 
             // Construct Schwab OAuth URL
-            const schwabAuthUrl = new URL(process.env.SCHWAB_AUTH_URL);
-            schwabAuthUrl.searchParams.append('client_id', process.env.SCHWAB_CLIENT_ID);
-            schwabAuthUrl.searchParams.append('redirect_uri', process.env.SCHWAB_REDIRECT_URI);
+            const schwabAuthUrl = `https://api.schwabapi.com/v1/oauth/authorize?client_id=${process.env.REACT_APP_SCHWAB_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_REDIRECT_URI)}`;
+
 
             // Log the URL for debugging
             console.log('Redirecting to:', schwabAuthUrl.toString());
