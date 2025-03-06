@@ -48,10 +48,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             // Construct Schwab OAuth URL
             const schwabAuthUrl = new URL(process.env.SCHWAB_AUTH_URL);
             schwabAuthUrl.searchParams.append('client_id', process.env.SCHWAB_CLIENT_ID);
-            schwabAuthUrl.searchParams.append('response_type', 'code');
             schwabAuthUrl.searchParams.append('redirect_uri', process.env.SCHWAB_REDIRECT_URI);
-            schwabAuthUrl.searchParams.append('state', state);
-            schwabAuthUrl.searchParams.append('scope', 'openid profile accounts holdings');
 
             // Log the URL for debugging
             console.log('Redirecting to:', schwabAuthUrl.toString());
