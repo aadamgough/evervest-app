@@ -1,6 +1,6 @@
 # EverVest Investment Application
 
-## Description
+## Description 
 
 EverVest is a powerful investment application designed to empower users with tools for financial planning and investment management. The platform offers features such as automated investment plans, personalized insights based on user preferences, and seamless integration with financial data sources. With EverVest, users can redefine their financial planning and investment decisions through automation and data integration.
 
