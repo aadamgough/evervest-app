@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         }
         
         // Exchange code for tokens with Schwab API
-        const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id=1wzwOrhivb2PkR1UCAUVTKYqC4MTNYlj&scope=readonly&redirect_uri=https://developer.schwab.com/oauth2-redirect.html', {
+        const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -79,7 +79,15 @@ export default async function handler(req, res) {
             });
         }
         
-        return res.status(200).json({ success: true });
+        if (dbError) {
+            console.error('Database error:', dbError);
+            return res.status(500).json({ error: 'Failed to store account information' });
+        }
+        
+        return res.status(200).json({ 
+            success: true,
+            accounts: accounts.accounts 
+        });
         
     } catch (error) {
         console.error('Token exchange error:', error);
