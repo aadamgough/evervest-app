@@ -5,10 +5,16 @@ import '../styles/ProfilePreview.css';
 function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
-    const handleLinkAccount = async () => {
+    const handleLinkAccount = () => {
+        setShowModal(true);
+    };
+
+    const handleSchwabLink = async () => {
         setLoading(true);
         setError(null);
+        setShowModal(false);
         
         try {
             // Get current session
@@ -29,7 +35,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             schwabAuthUrl.searchParams.append('response_type', 'code');
             schwabAuthUrl.searchParams.append('redirect_uri', process.env.REACT_APP_REDIRECT_URI);
             schwabAuthUrl.searchParams.append('state', state);
-            schwabAuthUrl.searchParams.append('scope', 'openid profile accounts holdings'); // Adjust scopes as needed
+            schwabAuthUrl.searchParams.append('scope', 'openid profile accounts holdings');
 
             // Log the URL for debugging
             console.log('Redirecting to:', schwabAuthUrl.toString());
@@ -45,58 +51,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
         }
     };
 
-    // Handle the OAuth callback
-    const handleOAuthCallback = async (code, state) => {
-        try {
-            // Verify state matches
-            const savedState = localStorage.getItem('schwab_state');
-            if (state !== savedState) {
-                throw new Error('Invalid state parameter');
-            }
-
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            // Exchange the code for tokens
-            const response = await fetch('/api/auth/exchange-token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({
-                    code,
-                    state
-                })
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-
-            // Store the linked account in Supabase
-            const { error: dbError } = await supabase
-                .from('linked_accounts')
-                .insert({
-                    user_id: session.user.id,
-                    provider: 'schwab',
-                    account_data: data.accounts,
-                    created_at: new Date().toISOString()
-                });
-
-            if (dbError) throw dbError;
-
-            // Trigger refresh of linked accounts
-            if (onLinkAccount) {
-                onLinkAccount();
-            }
-
-        } catch (error) {
-            console.error('Error completing account link:', error);
-            setError('Failed to complete account linking. Please try again.');
-        } finally {
-            // Clean up state from localStorage
-            localStorage.removeItem('schwab_state');
-        }
-    };
+    // ... rest of your existing code (handleOAuthCallback, etc.) ...
 
     return (
         <div className="profile-preview">
@@ -110,20 +65,50 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
                 <div className="linked-accounts-header">
                     <h2>Linked Brokerage Accounts</h2>
                     <button 
-                        className={`link-account-btn ${loading ? 'loading' : ''}`}
+                        className="link-account-btn"
                         onClick={handleLinkAccount}
-                        disabled={loading}
                         title="Link Brokerage Account"
                     >
-                        {loading ? 'Connecting...' : (
-                            <><span className="plus-icon">+</span> Link Account</>
-                        )}
+                        <span className="plus-icon">+</span> Link Account
                     </button>
                 </div>
                 
                 {error && (
                     <div className="error-message">
                         {error}
+                    </div>
+                )}
+                
+                {/* Bank Selection Modal */}
+                {showModal && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h3>Select Your Brokerage</h3>
+                                <button 
+                                    className="close-modal"
+                                    onClick={() => setShowModal(false)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <button 
+                                    className={`bank-option ${loading ? 'loading' : ''}`}
+                                    onClick={handleSchwabLink}
+                                    disabled={loading}
+                                >
+                                    <img 
+                                        src="https://res.cloudinary.com/dmsgmyybq/image/upload/v1741239025/swb_aqqumw.png" 
+                                        alt="Charles Schwab" 
+                                        className="bank-logo"
+                                    />
+                                    <span>Charles Schwab</span>
+                                    {loading && <div className="loading-spinner"></div>}
+                                </button>
+                                {/* Add more bank options here in the future */}
+                            </div>
+                        </div>
                     </div>
                 )}
                 
