@@ -33,14 +33,14 @@ function Profile() {
                 if (userError) throw userError;
                 setUser(userData);
 
-                // Fetch linked bank accounts (assuming you have a table for this)
-                // const { data: accountsData, error: accountsError } = await supabase
-                //     .from('linked_accounts') // Replace with your actual table name
-                //     .select('account_name') // Adjust the field as necessary
-                //     .eq('user_id', session.user.id);
+                    // Fetch linked bank accounts (assuming you have a table for this)
+                    const { data: accountsData, error: accountsError } = await supabase
+                        .from('linked_accounts') // Replace with your actual table name
+                        .select('account_name') // Adjust the field as necessary
+                        .eq('user_id', session.user.id);
 
                 if (accountsError) throw accountsError;
-                //setLinkedAccounts(accountsData.map(account => account.account_name)); // Adjust based on your data structure
+                setLinkedAccounts(accountsData.map(account => account.account_name)); // Adjust based on your data structure
 
             } catch (error) {
                 console.error('Error:', error);

@@ -1,11 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import '../styles/ProfilePreview.css';
 
 function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
     const handleLinkAccount = async () => {
+        setLoading(true);
+        setError(null);
+        
         try {
+            // Get current session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error('No active session');
+            }
+
+            // Generate random state for security
+            const state = Math.random().toString(36).substring(7);
+            
+            // Store state in localStorage for verification
+            localStorage.setItem('schwab_state', state);
+
+            // Construct Schwab OAuth URL
+            const schwabAuthUrl = new URL(process.env.REACT_APP_SCHWAB_AUTH_URL);
+            schwabAuthUrl.searchParams.append('client_id', process.env.REACT_APP_SCHWAB_CLIENT_ID);
+            schwabAuthUrl.searchParams.append('response_type', 'code');
+            schwabAuthUrl.searchParams.append('redirect_uri', process.env.REACT_APP_REDIRECT_URI);
+            schwabAuthUrl.searchParams.append('state', state);
+            schwabAuthUrl.searchParams.append('scope', 'openid profile accounts holdings'); // Adjust scopes as needed
+
+            // Log the URL for debugging
+            console.log('Redirecting to:', schwabAuthUrl.toString());
+
+            // Redirect to Schwab login
+            window.location.href = schwabAuthUrl.toString();
+
+        } catch (error) {
+            console.error('Error initiating account link:', error);
+            setError('Failed to initiate account linking. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle the OAuth callback
+    const handleOAuthCallback = async (code, state) => {
+        try {
+            // Verify state matches
+            const savedState = localStorage.getItem('schwab_state');
+            if (state !== savedState) {
+                throw new Error('Invalid state parameter');
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
             
+            // Exchange the code for tokens
             const response = await fetch('/api/auth/exchange-token', {
                 method: 'POST',
                 headers: {
@@ -13,18 +64,37 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
                     'Authorization': `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({
-                    code: authorizationCode,
-                    state: session.user.id
+                    code,
+                    state
                 })
             });
-    
+
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
-            
-            // Handle successful account linking
-            // Update UI, show success message, etc.
+
+            // Store the linked account in Supabase
+            const { error: dbError } = await supabase
+                .from('linked_accounts')
+                .insert({
+                    user_id: session.user.id,
+                    provider: 'schwab',
+                    account_data: data.accounts,
+                    created_at: new Date().toISOString()
+                });
+
+            if (dbError) throw dbError;
+
+            // Trigger refresh of linked accounts
+            if (onLinkAccount) {
+                onLinkAccount();
+            }
+
         } catch (error) {
-            console.error('Error linking account:', error);
+            console.error('Error completing account link:', error);
+            setError('Failed to complete account linking. Please try again.');
+        } finally {
+            // Clean up state from localStorage
+            localStorage.removeItem('schwab_state');
         }
     };
 
@@ -40,13 +110,22 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
                 <div className="linked-accounts-header">
                     <h2>Linked Brokerage Accounts</h2>
                     <button 
-                        className="link-account-btn" 
+                        className={`link-account-btn ${loading ? 'loading' : ''}`}
                         onClick={handleLinkAccount}
+                        disabled={loading}
                         title="Link Brokerage Account"
                     >
-                        <span className="plus-icon">+</span> Link Account
+                        {loading ? 'Connecting...' : (
+                            <><span className="plus-icon">+</span> Link Account</>
+                        )}
                     </button>
                 </div>
+                
+                {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}
                 
                 {linkedAccounts && linkedAccounts.length > 0 ? (
                     <ul className="accounts-list">
@@ -61,7 +140,9 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
                         ))}
                     </ul>
                 ) : (
-                    <p className="no-accounts-message">No brokerage accounts linked. Click the button above to connect your first account.</p>
+                    <p className="no-accounts-message">
+                        No brokerage accounts linked. Click the button above to connect your first account.
+                    </p>
                 )}
             </div>
         </div>

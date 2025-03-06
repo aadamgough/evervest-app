@@ -38,7 +38,7 @@ export default async function handler(req, res) {
             body: new URLSearchParams({
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: process.env.REDIRECT_URI
+                redirect_uri: process.env.SCHWAB_REDIRECT_URI
             })
         });
         
