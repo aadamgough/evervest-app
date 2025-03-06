@@ -45,10 +45,10 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             // Store state in localStorage for verification
             localStorage.setItem('schwab_state', state);
 
-            console.log(process.env.SCHWAB_CLIENT_ID);
-            console.log(process.env.SCHWAB_REDIRECT_URI);
+            console.log(process.env.REACT_APP_SCHWAB_CLIENT_ID);
+            console.log(process.env.REACT_APP_SCHWAB_REDIRECT_URI);
             // Construct Schwab OAuth URL
-            const schwabAuthUrl = `https://api.schwabapi.com/v1/oauth/authorize?client_id=${process.env.SCHWAB_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.SCHWAB_REDIRECT_URI)}`;
+            const schwabAuthUrl = `https://api.schwabapi.com/v1/oauth/authorize?client_id=${process.env.REACT_APP_SCHWAB_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SCHWAB_REDIRECT_URI)}`;
 
 
             // Log the URL for debugging

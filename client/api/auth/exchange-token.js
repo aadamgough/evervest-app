@@ -33,12 +33,12 @@ export default async function handler(req, res) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${Buffer.from(`${process.env.SCHWAB_CLIENT_ID}:${process.env.SCHWAB_CLIENT_SECRET}`).toString('base64')}`
+                'Authorization': `Basic ${Buffer.from(`${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`).toString('base64')}`
             },
             body: new URLSearchParams({
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: process.env.SCHWAB_REDIRECT_URI
+                redirect_uri: process.env.REACT_APP_SCHWAB_REDIRECT_URI
             })
         });
         
