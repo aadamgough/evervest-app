@@ -1,70 +1,118 @@
-# Getting Started with Create React App
+# EverVest Investment Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Description
 
-## Available Scripts
+EverVest is a powerful investment application designed to empower users with tools for financial planning and investment management. The platform offers features such as automated investment plans, personalized insights based on user preferences, and seamless integration with financial data sources. With EverVest, users can redefine their financial planning and investment decisions through automation and data integration.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- User authentication with Supabase
+- Investment plan generation using LLaMA API
+- User-friendly interface for managing investments
+- Responsive design for mobile and desktop
+- Secure data handling and storage
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technologies Used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Frontend**: React, React Router, CSS
+- **Backend**: Supabase (for authentication and database)
+- **API Integration**: LLaMA API for investment plan generation
+- **Deployment**: Vercel
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
 
-### `npm run build`
+Before you begin, ensure you have the following installed on your machine:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [Node.js](https://nodejs.org/) (version 14 or higher)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+- A Supabase account and project
+- Access to the LLaMA API
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Cloning the Repository
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Open your terminal or command prompt.
+2. Navigate to the directory where you want to clone the repository.
+3. Run the following command:
 
-### `npm run eject`
+   ```bash
+   git clone https://github.com/aadamgough/evervest-app.git
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Navigate into the cloned directory:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   cd evervest-app
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Setting Up Environment Variables
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Create a `.env` file in the `client` directory:
 
-## Learn More
+   ```bash
+   touch client/.env
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. Add the following environment variables to the `.env` file:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```plaintext
+   REACT_APP_SUPABASE_URL=your_supabase_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   REACT_APP_SCHWAB_CLIENT_ID=your_schwab_client_id
+   REACT_APP_REDIRECT_URI=your_redirect_uri
+   LLAMA_API_KEY=your_llama_api_key
+   ```
 
-### Code Splitting
+3. Replace the placeholder values with your actual API keys and URLs.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Installing Dependencies
 
-### Analyzing the Bundle Size
+1. Navigate to the `client` directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   ```bash
+   cd client
+   ```
 
-### Making a Progressive Web App
+2. Install the required dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+   ```bash
+   npm install
+   ```
 
-### Advanced Configuration
+### Running the Application
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. Start the development server:
+
+   ```bash
+   npm start
+   ```
+
+2. Open your browser and navigate to `http://localhost:3000` to view the application.
+
+### Building for Production
+
+To create a production build of the application, run:
+
+bash
+npm run build
+
+This will generate a `build` directory containing the optimized production files.
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+You can deploy the application to Vercel or any other hosting service of your choice. Follow the respective service's documentation for deployment instructions.
 
-### `npm run build` fails to minify
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Supabase](https://supabase.io/) for providing the backend services.
+- [LLaMA API](https://llama-api.com/) for investment plan generation.
+- [React](https://reactjs.org/) for building the user interface.
