@@ -35,7 +35,7 @@ function Profile() {
 
                 // Fetch linked bank accounts (assuming you have a table for this)
                 const { data: accountsData, error: accountsError } = await supabase
-                    .from('linked_accounts') // Replace with your actual table name
+                    .from('linked_brokerage_accounts') // Replace with your actual table name
                     .select('account_name') // Adjust the field as necessary
                     .eq('user_id', session.user.id);
 

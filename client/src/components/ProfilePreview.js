@@ -45,6 +45,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             // Store state in localStorage for verification
             localStorage.setItem('schwab_state', state);
 
+
             // Construct Schwab OAuth URL
             const schwabAuthUrl = new URL(process.env.SCHWAB_AUTH_URL);
             schwabAuthUrl.searchParams.append('client_id', process.env.SCHWAB_CLIENT_ID);
