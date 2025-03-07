@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useLocation } from 'react-router-dom';
-import '../styles/ProfilePreview.css';
+import '../styles/ProfilePreview.css'; 
 
 function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     const [loading, setLoading] = useState(false);
