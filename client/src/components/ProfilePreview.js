@@ -55,7 +55,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             console.log('Redirecting to:', schwabAuthUrl.toString());
 
             // Redirect to Schwab login
-            window.location.href = schwabAuthUrl.toString();
+            window.open(schwabAuthUrl, '_blank');
 
         } catch (error) {
             console.error('Error initiating account link:', error);
