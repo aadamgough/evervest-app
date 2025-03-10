@@ -29,9 +29,7 @@ export default async function handler(req, res) {
         // URL decode the authorization code as specified
         const decodedCode = decodeURIComponent(code);
         
-        // Exchange code for tokens with Schwab API
-
-        if (req.body.refresh_token) {
+       
         const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
@@ -92,7 +90,6 @@ export default async function handler(req, res) {
             success: true,
             accounts: accounts.accounts 
         });
-    }
         
     } catch (error) {
         console.error('Token exchange error:', error);
