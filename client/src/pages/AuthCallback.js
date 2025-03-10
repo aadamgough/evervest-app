@@ -10,6 +10,9 @@ function AuthCallback() {
     useEffect(() => {
         const handleCallback = async () => {
             try {
+                console.log('AuthCallback component mounted');
+                console.log('Current URL:', window.location.href);
+                
                 // Get the authorization code from URL
                 const params = new URLSearchParams(location.search);
                 const code = params.get('code');
@@ -18,6 +21,9 @@ function AuthCallback() {
                 if (!code) {
                     throw new Error('No authorization code received');
                 }
+
+                console.log('Received code:', code);
+                console.log('Received state:', state);
                 
                 // Exchange code for tokens (this should be done server-side)
                 const response = await fetch('/api/auth/exchange-token', {
