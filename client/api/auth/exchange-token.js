@@ -6,6 +6,8 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) { 
+    console.log('Exchange token endpoint hit');
+    console.log('Request body:', req.body);
     // Handle CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,23 +34,12 @@ export default async function handler(req, res) {
         // URL decode the authorization code as specified
         const decodedCode = decodeURIComponent(code);
         
-        // Verify state matches a user ID
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', state)
-            .single();
-            
-        if (userError || !userData) {
-            return res.status(400).json({ error: 'Invalid state parameter' });
-        }
-        
         // Exchange code for tokens with Schwab API
         const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${Buffer.from(`${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`).toString('base64')}`
+                'Authorization': `Basic ${authString}`
             },
             body: new URLSearchParams({
                 grant_type: 'authorization_code',

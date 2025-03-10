@@ -67,55 +67,24 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
 
     const handleOAuthCallback = async (code, state) => {
         try {
-            // Verify state matches
-            const savedState = localStorage.getItem('schwab_state');
-            if (state !== savedState) {
-                throw new Error('Invalid state parameter');
-            }
-
-            const { data: { session } } = await supabase.auth.getSession();
+            console.log('Received callback with code:', code);
+            console.log('State:', state);
             
-            // Exchange the code for tokens
             const response = await fetch('/api/auth/exchange-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify({
-                    code,
-                    state
-                })
+                body: JSON.stringify({ code, state })
             });
-
+    
+            console.log('Exchange token response status:', response.status);
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-
-            // Store the linked account in Supabase
-            const { error: dbError } = await supabase
-                .from('linked_accounts')
-                .insert({
-                    user_id: session.user.id,
-                    provider: 'schwab',
-                    account_data: data.accounts,
-                    created_at: new Date().toISOString()
-                });
-
-            if (dbError) throw dbError;
-
-            // Trigger refresh of linked accounts
-            if (onLinkAccount) {
-                onLinkAccount();
-            }
-
+            console.log('Exchange token response:', data);
         } catch (error) {
-            console.error('Error completing account link:', error);
-            setError('Failed to complete account linking. Please try again.');
-        } finally {
-            // Clean up state from localStorage
-            localStorage.removeItem('schwab_state');
+            console.error('Callback error:', error);
         }
-    };
+    }
 
     return (
         <div className="profile-preview">
