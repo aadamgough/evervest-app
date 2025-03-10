@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         }
         
         // Exchange code for tokens with Schwab API
-        const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
+        const tokenResponse = await fetch('https://api.schwabapi.com/v2/oauth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
