@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         const tokens = await tokenResponse.json();
         
         // Get account information
-        const accountsResponse = await fetch('https://api.schwab.com/v1/accounts', {
+        const accountsResponse = await fetch('https://api.schwabapi.com/v1/accounts', {
             headers: {
                 'Authorization': `Bearer ${tokens.access_token}`
             }
