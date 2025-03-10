@@ -87,7 +87,7 @@ export default async function handler(req, res) {
             console.error('Database error:', dbError);
             return res.status(500).json({ error: 'Failed to store account information' });
         }
-        
+         
         return res.status(200).json({ 
             success: true,
             accounts: accounts.accounts 
