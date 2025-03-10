@@ -6,6 +6,48 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY
 );
 
+async function refreshToken(refresh_token) {
+    try {
+        const authString = Buffer.from(
+            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`
+        ).toString('base64');
+
+        const response = await fetch('https://api.schwabapi.com/v1/oauth/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Basic ${authString}`
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to refresh token');
+        }
+
+        const tokens = await response.json();
+        
+        // Update tokens in database
+        const { error: dbError } = await supabase
+            .from('linked_brokerage_accounts')
+            .update({
+                access_token: tokens.access_token,
+                token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+            })
+            .eq('refresh_token', refresh_token);
+
+        if (dbError) throw dbError;
+        
+        return tokens.access_token;
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        throw error;
+    }
+}
+
 export default async function handler(req, res) { 
     console.log('Exchange token endpoint hit');
     console.log('Request body:', req.body);
@@ -17,6 +59,16 @@ export default async function handler(req, res) {
     
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
+    }
+
+    // Add handling for refresh token requests
+    if (req.body.refresh_token) {
+        try {
+            const newToken = await refreshToken(req.body.refresh_token);
+            return res.status(200).json({ access_token: newToken });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to refresh token' });
+        }
     }
 
     try {
@@ -46,8 +98,15 @@ export default async function handler(req, res) {
         
         if (!tokenResponse.ok) {
             const errorData = await tokenResponse.text();
-            console.error('Token exchange error:', errorData);
-            return res.status(400).json({ error: 'Failed to exchange token' });
+            console.error('Detailed token exchange error:', {
+                status: tokenResponse.status,
+                statusText: tokenResponse.statusText,
+                error: errorData
+            });
+            return res.status(tokenResponse.status).json({ 
+                error: 'Token exchange failed',
+                details: errorData
+            });
         }
         
         const tokens = await tokenResponse.json();
@@ -93,7 +152,10 @@ export default async function handler(req, res) {
         });
         
     } catch (error) {
-        console.error('Token exchange error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('Detailed error:', error);
+        return res.status(500).json({ 
+            error: 'Internal server error',
+            message: error.message
+        });
     }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useLocation } from 'react-router-dom';
+import { ensureFreshToken } from '../utils/tokenUtils';
 import '../styles/ProfilePreview.css'; 
 
 function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
@@ -42,7 +43,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             }
 
             // Generate random state for security
-            const state = Math.random().toString(36).substring(7);
+            const state = session.user.id;
             
             // Store state in localStorage for verification
             localStorage.setItem('schwab_state', state);
@@ -97,15 +98,32 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             // Clear the saved state
             localStorage.removeItem('schwab_state');
             
-            // Refresh the linked accounts list if needed
-            if (onLinkAccount) {
-                onLinkAccount();
+            if (response.ok) {
+                // Get fresh token for immediate use
+                await makeSchawbApiCall();
+                
+                // Refresh the linked accounts list
+                if (onLinkAccount) {
+                    onLinkAccount();
+                }
             }
+
         } catch (error) {
             console.error('Callback error:', error);
             setError(error.message);
         }
     };
+
+    // In any component that makes Schwab API calls
+        const makeSchawbApiCall = async () => {
+            try {
+                const token = await ensureFreshToken();
+                return token;
+            } catch (error) {
+                console.error('API call error:', error);
+                setError('Failed to access Schwab account');
+            }
+        };
 
     return (
         <div className="profile-preview">

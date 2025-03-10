@@ -6,7 +6,7 @@ function AuthCallback() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
+    useEffect(() => { 
         const handleCallback = async () => {
             try {
                 console.log('AuthCallback component mounted');
@@ -17,7 +17,7 @@ function AuthCallback() {
                 const code = params.get('code');
                 const state = params.get('state');
                 
-                if (!code) {
+                if (!code || !state) {
                     throw new Error('No authorization code received');
                 }
 
