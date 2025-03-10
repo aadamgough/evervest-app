@@ -8,6 +8,50 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const location = useLocation();
+
+    // Token refresh check function
+    const checkAndRefreshToken = async () => {
+        try {
+            const { data: account } = await supabase
+                .from('linked_brokerage_accounts')
+                .select('*')
+                .eq('provider', 'Schwab')
+                .eq('user_id', user.id)
+                .single();
+
+            if (!account) return null;
+
+            const tokenExpiry = new Date(account.token_expires_at);
+            const now = new Date();
+
+            // If token expires in less than 5 minutes, refresh it
+            if (tokenExpiry.getTime() - now.getTime() < 5 * 60 * 1000) {
+                const response = await fetch('/api/auth/exchange-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        refresh_token: account.refresh_token
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to refresh token');
+                }
+
+                const { access_token } = await response.json();
+                return access_token;
+            }
+
+            return account.access_token;
+        } catch (error) {
+            console.error('Token refresh error:', error);
+            throw error;
+        }
+    };
+
+
     useEffect(() => {
         // Get the URL search params
         const searchParams = new URLSearchParams(location.search);
@@ -68,7 +112,17 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     const handleOAuthCallback = async (code, state) => {
         try {
             console.log('Received callback with code:', code);
-            console.log('State:', state);
+            
+            // Verify state from localStorage
+            const savedState = localStorage.getItem('schwab_state');
+            if (state !== savedState) {
+                throw new Error('Invalid state parameter');
+            }
+            
+            const token = await makeSchawbApiCall();
+            if (!token) {
+                throw new Error('No valid token found');
+            }
             
             const response = await fetch('/api/auth/exchange-token', {
                 method: 'POST',
@@ -80,11 +134,40 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     
             console.log('Exchange token response status:', response.status);
             const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to exchange token');
+            }
+
             console.log('Exchange token response:', data);
+            
+            // Clear the saved state
+            localStorage.removeItem('schwab_state');
+            
+            // Refresh the linked accounts list if needed
+            if (onLinkAccount) {
+                onLinkAccount();
+            }
         } catch (error) {
             console.error('Callback error:', error);
+            setError(error.message);
         }
-    }
+    };
+
+    // Function to make authenticated Schwab API calls
+    const makeSchawbApiCall = async () => {
+        try {
+            const token = await checkAndRefreshToken();
+            if (!token) {
+                throw new Error('No valid token found');
+            }
+            // Make your API call using the fresh token
+            return token;
+        } catch (error) {
+            console.error('API call error:', error);
+            throw error;
+        }
+    };
 
     return (
         <div className="profile-preview">

@@ -11,6 +11,8 @@ export default async function handler(req, res) {
     // Handle CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
+
+
     
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
@@ -19,22 +21,17 @@ export default async function handler(req, res) {
     try {
         const { code, state } = req.body;
 
-        console.log('Received code:', code);
-        console.log('Received state:', state);
-
          // Exchange code for tokens with Schwab API
          const authString = Buffer.from(
-            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`
-        ).toString('base64');
-        
-        console.log('Client ID:', process.env.REACT_APP_SCHWAB_CLIENT_ID);
-        console.log('Auth string:', authString);
+            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`).toString('base64');
         
 
         // URL decode the authorization code as specified
         const decodedCode = decodeURIComponent(code);
         
         // Exchange code for tokens with Schwab API
+
+        if (req.body.refresh_token) {
         const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
@@ -95,6 +92,7 @@ export default async function handler(req, res) {
             success: true,
             accounts: accounts.accounts 
         });
+    }
         
     } catch (error) {
         console.error('Token exchange error:', error);
