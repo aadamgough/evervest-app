@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Investments from './pages/Investments';
 import Profile from './pages/Profile';
