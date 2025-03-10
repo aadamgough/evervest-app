@@ -1,4 +1,4 @@
-import { supabase } from '../../src/lib/supabaseClient';  // Update path as needed
+import { supabase } from '../../../src/lib/supabaseClient';  // Update path as needed
 
 
 export default async function handler(req, res) { 
