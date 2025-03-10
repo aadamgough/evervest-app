@@ -14,6 +14,7 @@ import Questionnaire from './pages/Questionnaire';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
 import RiskToleranceQuestionnaire from './pages/RiskToleranceQuestionnaire';
 import ESGQuestionnaire from './pages/ESGQuestionnaire';
+import AuthCallback from './pages/AuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
 
 import './App.css';
@@ -25,7 +26,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/auth-callback" element={<AuthCallback />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/investments" element={<Investments />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/contact" element={<Contact />} />
