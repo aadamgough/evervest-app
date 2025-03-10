@@ -16,6 +16,9 @@ export default async function handler(req, res) {
 
     try {
         const { code, state } = req.body;
+
+        // URL decode the authorization code as specified
+        const decodedCode = decodeURIComponent(code);
         
         // Verify state matches a user ID
         const { data: userData, error: userError } = await supabase
@@ -29,7 +32,7 @@ export default async function handler(req, res) {
         }
         
         // Exchange code for tokens with Schwab API
-        const tokenResponse = await fetch('https://api.schwabapi.com/v2/oauth/token', {
+        const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +40,7 @@ export default async function handler(req, res) {
             },
             body: new URLSearchParams({
                 grant_type: 'authorization_code',
-                code,
+                code: decodedCode,
                 redirect_uri: process.env.REACT_APP_SCHWAB_REDIRECT_URI
             })
         });
@@ -75,6 +78,7 @@ export default async function handler(req, res) {
                 access_token: tokens.access_token,
                 refresh_token: tokens.refresh_token,
                 token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+                refresh_token_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                 metadata: account
             });
         }
