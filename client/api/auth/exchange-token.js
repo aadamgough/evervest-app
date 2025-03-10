@@ -17,6 +17,18 @@ export default async function handler(req, res) {
     try {
         const { code, state } = req.body;
 
+        console.log('Received code:', code);
+        console.log('Received state:', state);
+
+         // Exchange code for tokens with Schwab API
+         const authString = Buffer.from(
+            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`
+        ).toString('base64');
+        
+        console.log('Client ID:', process.env.REACT_APP_SCHWAB_CLIENT_ID);
+        console.log('Auth string:', authString);
+        
+
         // URL decode the authorization code as specified
         const decodedCode = decodeURIComponent(code);
         
