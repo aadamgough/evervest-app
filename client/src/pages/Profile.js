@@ -5,7 +5,6 @@ import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import ProfilePreview from '../components/ProfilePreview';
 import '../App.css';
-import '../styles/ProfilePreview.css'; 
 
 function Profile() {
     const navigate = useNavigate();
@@ -87,43 +86,10 @@ function Profile() {
                 <Navbar isLoggedIn={true} />
                 <div className="dashboard-content">
                     <div className="action-buttons-container">
-                        <ProfilePreview user={user} linkedAccounts={linkedAccounts} />
-                        
-                        {/* Display Linked Accounts */}
-                        <div className="linked-accounts-section">
-                            <h2>Linked Accounts</h2>
-                            {linkedAccounts.map((account) => (
-                                <div key={account.id} className="account-card">
-                                    <h3>{account.name}</h3>
-                                    <p>Account ending in: {account.last4}</p>
-                                    <p>Type: {account.type}</p>
-                                    
-                                    {/* Display Balances */}
-                                    {account.balances && (
-                                        <div className="account-balances">
-                                            <h4>Current Balances</h4>
-                                            <p>Available Funds: {formatCurrency(account.balances.availableFunds || 0)}</p>
-                                            <p>Total Equity: {formatCurrency(account.balances.equity || 0)}</p>
-                                            <p>Buying Power: {formatCurrency(account.balances.buyingPower || 0)}</p>
-                                        </div>
-                                    )}
-                                    
-                                    {/* Display Positions Summary */}
-                                    {account.positions && account.positions.length > 0 && (
-                                        <div className="account-positions">
-                                            <h4>Positions ({account.positions.length})</h4>
-                                            <div className="positions-list">
-                                                {account.positions.map((position, index) => (
-                                                    <div key={index} className="position-item">
-                                                        <p>{position.instrument?.symbol}: {formatCurrency(position.marketValue || 0)}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+                        <ProfilePreview 
+                            user={user} 
+                            linkedAccounts={linkedAccounts} 
+                        />
                     </div>
                 </div>
             </div>

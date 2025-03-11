@@ -8,6 +8,7 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [expandedAccount, setExpandedAccount] = useState(null);
     const location = useLocation();
 
 
@@ -56,8 +57,8 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             const schwabAuthUrl = `https://api.schwabapi.com/v1/oauth/authorize?` + 
             `client_id=${process.env.REACT_APP_SCHWAB_CLIENT_ID}` +
             `&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SCHWAB_REDIRECT_URI)}` +
-            `&state=${state}` +  // Add this line
-            `&response_type=code`;  // Add this if not present
+            `&state=${state}` +
+            `&response_type=code`; 
 
             console.log('Auth URL:', schwabAuthUrl); // Debug log
 
@@ -132,6 +133,17 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
             }
         };
 
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        };
+    
+        const toggleAccountDetails = (accountId) => {
+            setExpandedAccount(expandedAccount === accountId ? null : accountId);
+        };
+
     return (
         <div className="profile-preview">
             <div className="card personal-info">
@@ -193,13 +205,49 @@ function ProfilePreview({ user, linkedAccounts, onLinkAccount }) {
                 
                 {linkedAccounts && linkedAccounts.length > 0 ? (
                     <ul className="accounts-list">
-                        {linkedAccounts.map((account, index) => (
-                            <li key={index} className="account-item">
-                                <div className="account-info">
-                                    <span className="account-name">{account.name}</span>
-                                    <span className="account-number">•••• {account.last4}</span>
+                        {linkedAccounts.map((account) => (
+                            <li key={account.id} className="account-item">
+                                <div 
+                                    className="account-header"
+                                    onClick={() => toggleAccountDetails(account.id)}
+                                >
+                                    <div className="account-info">
+                                        <span className="account-name">{account.name}</span>
+                                        <span className="account-number">•••• {account.last4}</span>
+                                    </div>
+                                    <span className="account-type">{account.type}</span>
+                                    <span className={`dropdown-arrow ${expandedAccount === account.id ? 'expanded' : ''}`}>
+                                        ▼
+                                    </span>
                                 </div>
-                                <span className="account-type">{account.type}</span>
+                                
+                                {expandedAccount === account.id && (
+                                    <div className="account-details">
+                                        {/* Display Balances */}
+                                        {account.balances && (
+                                            <div className="account-balances">
+                                                <h4>Current Balances</h4>
+                                                <p>Available Funds: {formatCurrency(account.balances.availableFunds || 0)}</p>
+                                                <p>Total Equity: {formatCurrency(account.balances.equity || 0)}</p>
+                                                <p>Buying Power: {formatCurrency(account.balances.buyingPower || 0)}</p>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Display Positions Summary */}
+                                        {account.positions && account.positions.length > 0 && (
+                                            <div className="account-positions">
+                                                <h4>Positions ({account.positions.length})</h4>
+                                                <div className="positions-list">
+                                                    {account.positions.map((position, index) => (
+                                                        <div key={index} className="position-item">
+                                                            <p>{position.instrument?.symbol}: {formatCurrency(position.marketValue || 0)}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </li>
                         ))}
                     </ul>
