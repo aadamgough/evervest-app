@@ -125,7 +125,10 @@ export default async function handler(req, res) {
                     details: tokens
                 });
             }
-    
+
+
+    console.log("Attempting to fetch accounts with token:", tokens.access_token.substring(0, 20) + '...');
+
             // Get account information using the parsed tokens
             const accountsResponse = await fetch('https://api.schwabapi.com/v1/accounts', {
                 headers: {
@@ -134,10 +137,20 @@ export default async function handler(req, res) {
             });
             
             if (!accountsResponse.ok) {
-                return res.status(400).json({ error: 'Failed to fetch account information' });
+                const errorText = await accountsResponse.text();
+                console.error('Account fetch failed:', {
+                    status: accountsResponse.status,
+                    statusText: accountsResponse.statusText,
+                    error: errorText
+                });
+                return res.status(400).json({ 
+                    error: 'Failed to fetch account information',
+                    details: errorText
+                });
             }
             
             const accounts = await accountsResponse.json();
+            console.log('Accounts response:', accounts); 
             
             // Store account information in database
             for (const account of accounts.accounts) {
