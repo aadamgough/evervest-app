@@ -201,8 +201,7 @@ export default async function handler(req, res) {
             }
              
             return res.status(200).json({ 
-                success: true,
-                accounts: accounts.accounts 
+                success: true
             });
             
         } catch (parseError) {
