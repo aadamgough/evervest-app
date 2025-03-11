@@ -149,23 +149,31 @@ export default async function handler(req, res) {
                 });
             }
             
-            const accounts = await accountsResponse.json();
-            console.log('Accounts response:', accounts); 
-            
-            // Store account information in database
-            for (const account of accounts.accounts) {
+            const accountsData = await accountsResponse.json();
+            console.log('Accounts response:', accountsData);
+
+            // Adjust the database storage loop for the new structure
+            for (const accountWrapper of accountsData) {
+                const account = accountWrapper.securitiesAccount;
                 const { error: dbError } = await supabase.from('linked_brokerage_accounts').insert({
                     user_id: state,
                     provider: 'Schwab',
-                    account_id: account.account_id,
-                    account_name: account.nickname || `Schwab ${account.account_type}`,
-                    account_type: account.account_type,
-                    account_number_last4: account.mask,
+                    account_id: account.accountNumber,
+                    account_name: `Schwab Account ${account.accountNumber}`,
+                    account_type: 'securities',  // or derive from account data if available
+                    account_number_last4: account.accountNumber.slice(-4),
                     access_token: tokens.access_token,
                     refresh_token: tokens.refresh_token,
                     token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
                     refresh_token_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    metadata: account
+                    metadata: {
+                        positions: account.positions,
+                        balances: {
+                            current: account.currentBalances,
+                            initial: account.initialBalances,
+                            projected: account.projectedBalances
+                        }
+                    }
                 });
     
                 if (dbError) {
