@@ -51,7 +51,7 @@ function Profile() {
                 // Transform the accounts data to include relevant details
                 const formattedAccounts = accountsData.map(account => ({
                     id: account.account_id,
-                    name: account.provider + "Brokerage Account",
+                    name: account.provider + " Brokerage Account",
                     type: account.account_type,
                     last4: account.account_number_last4,
                     provider: account.provider,
