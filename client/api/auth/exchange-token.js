@@ -82,25 +82,30 @@ export default async function handler(req, res) {
         // URL decode the authorization code as specified
         const decodedCode = decodeURIComponent(code);
         
-       
+        console.log("BEFORE THE TOKENRESPONSE!!")
         const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${authString}`
+                'Authorization': `Basic ${authString}`,
+                'Accept': 'application/json' 
             },
             body: new URLSearchParams({
                 grant_type: 'authorization_code',
                 code: decodedCode,
-                redirect_uri: process.env.REACT_APP_SCHWAB_REDIRECT_URI
-            })
+                redirect_uri: process.env.REACT_APP_SCHWAB_REDIRECT_URI,
+                client_id: process.env.REACT_APP_SCHWAB_CLIENT_ID
+            }).toString()
         });
+
+        console.log("AFTER THE TOKENRESPONSE!!", tokenResponse);
         
         if (!tokenResponse.ok) {
             const errorData = await tokenResponse.text();
             console.error('Detailed token exchange error:', {
                 status: tokenResponse.status,
                 statusText: tokenResponse.statusText,
+                headers: tokenResponse.headers,
                 error: errorData
             });
             return res.status(tokenResponse.status).json({ 
