@@ -130,7 +130,7 @@ export default async function handler(req, res) {
     console.log("Attempting to fetch accounts with token:", tokens.access_token.substring(0, 20) + '...');
 
             // Get account information using the parsed tokens
-            const accountsResponse = await fetch('https://api.schwabapi.com/v1/accounts', {
+            const accountsResponse = await fetch('https://api.schwabapi.com/trader/v1/accounts', {
                 headers: {
                     'Authorization': `Bearer ${tokens.access_token}`
                 }
