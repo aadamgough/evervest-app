@@ -85,16 +85,13 @@ export default async function handler(req, res) {
 
     try {
         const { code, state } = req.body;
-
-         // Exchange code for tokens with Schwab API
-         const authString = Buffer.from(
-            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`).toString('base64');
-        
-
-        // URL decode the authorization code as specified
+        const authString = Buffer.from(
+            `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`
+        ).toString('base64');
+    
         const decodedCode = decodeURIComponent(code);
         
-        console.log("BEFORE THE TOKENRESPONSE!!")
+        console.log("BEFORE THE TOKENRESPONSE!!");
         const tokenResponse = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
             headers: {
@@ -109,17 +106,66 @@ export default async function handler(req, res) {
                 client_id: process.env.REACT_APP_SCHWAB_CLIENT_ID
             }).toString()
         });
-
+    
         console.log("AFTER THE TOKENRESPONSE!!", tokenResponse);
-
-        // Add this logging
+        
+        // Read the response body only once
         const responseText = await tokenResponse.text();
         console.log("Token Response Body:", responseText);
         
-        let tokenss;
+        let tokens;
         try {
-            tokenss = JSON.parse(responseText);
-            console.log("Parsed tokenss:", tokenss);
+            tokens = JSON.parse(responseText);
+            console.log("Parsed tokens:", tokens);
+            
+            if (!tokens.access_token) {
+                console.error("No access token in response:", tokens);
+                return res.status(400).json({ 
+                    error: 'Invalid token response',
+                    details: tokens
+                });
+            }
+    
+            // Get account information using the parsed tokens
+            const accountsResponse = await fetch('https://api.schwabapi.com/v1/accounts', {
+                headers: {
+                    'Authorization': `Bearer ${tokens.access_token}`
+                }
+            });
+            
+            if (!accountsResponse.ok) {
+                return res.status(400).json({ error: 'Failed to fetch account information' });
+            }
+            
+            const accounts = await accountsResponse.json();
+            
+            // Store account information in database
+            for (const account of accounts.accounts) {
+                const { error: dbError } = await supabase.from('linked_brokerage_accounts').insert({
+                    user_id: state,
+                    provider: 'Schwab',
+                    account_id: account.account_id,
+                    account_name: account.nickname || `Schwab ${account.account_type}`,
+                    account_type: account.account_type,
+                    account_number_last4: account.mask,
+                    access_token: tokens.access_token,
+                    refresh_token: tokens.refresh_token,
+                    token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+                    refresh_token_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    metadata: account
+                });
+    
+                if (dbError) {
+                    console.error('Database error:', dbError);
+                    return res.status(500).json({ error: 'Failed to store account information' });
+                }
+            }
+             
+            return res.status(200).json({ 
+                success: true,
+                accounts: accounts.accounts 
+            });
+            
         } catch (parseError) {
             console.error("Error parsing token response:", parseError);
             return res.status(500).json({ 
@@ -127,70 +173,6 @@ export default async function handler(req, res) {
                 details: responseText
             });
         }
-        
-        if (!tokenss.access_token) {
-            console.error("No access token in response:", tokenss);
-            return res.status(400).json({ 
-                error: 'Invalid token response',
-                details: tokenss
-            });
-        }
-        
-        if (!tokenResponse.ok) {
-            const errorData = await tokenResponse.text();
-            console.error('Detailed token exchange error:', {
-                status: tokenResponse.status,
-                statusText: tokenResponse.statusText,
-                headers: tokenResponse.headers,
-                error: errorData
-            });
-            return res.status(tokenResponse.status).json({ 
-                error: 'Token exchange failed',
-                details: errorData
-            });
-        }
-        
-        const tokens = await tokenResponse.json();
-        
-        // Get account information
-        const accountsResponse = await fetch('https://api.schwabapi.com/v1/accounts', {
-            headers: {
-                'Authorization': `Bearer ${tokens.access_token}`
-            }
-        });
-        
-        if (!accountsResponse.ok) {
-            return res.status(400).json({ error: 'Failed to fetch account information' });
-        }
-        
-        const accounts = await accountsResponse.json();
-        
-        // Store account information in database
-        for (const account of accounts.accounts) {
-            await supabase.from('linked_brokerage_accounts').insert({
-                user_id: state,
-                provider: 'Schwab',
-                account_id: account.account_id,
-                account_name: account.nickname || `Schwab ${account.account_type}`,
-                account_type: account.account_type,
-                account_number_last4: account.mask,
-                access_token: tokens.access_token,
-                refresh_token: tokens.refresh_token,
-                token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-                refresh_token_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                metadata: account
-            });
-        }
-        
-        if (dbError) {
-            console.error('Database error:', dbError);
-            return res.status(500).json({ error: 'Failed to store account information' });
-        }
-         
-        return res.status(200).json({ 
-            success: true,
-            accounts: accounts.accounts 
-        });
         
     } catch (error) {
         console.error('Detailed error:', error);
