@@ -51,7 +51,15 @@ function AuthCallback() {
                     throw new Error('Failed to exchange authorization code');
                 }
                 
-                setStatus('Account successfully linked!');
+                const data = await response.json();
+        
+                if (data.alreadyLinked) {
+                    setStatus('Account already linked!');
+                } else if (data.success) {
+                    setStatus('Account successfully linked!');
+                } else {
+                    throw new Error(data.error || 'Failed to link account');
+                }
                 
                 // Redirect back to profile page after a delay
                 setTimeout(() => {

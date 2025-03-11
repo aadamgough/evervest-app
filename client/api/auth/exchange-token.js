@@ -173,6 +173,26 @@ export default async function handler(req, res) {
             // Adjust the database storage loop for the new structure
             for (const accountWrapper of accountsData) {
                 const account = accountWrapper.securitiesAccount;
+                // First check if account already exists
+                const { data: existingAccount, error: checkError } = await supabase
+                .from('linked_brokerage_accounts')
+                .select()
+                .eq('user_id', userId)
+                .eq('provider', 'Schwab')
+                .eq('account_id', account.accountNumber)
+                .single();
+
+            if (checkError && checkError.code !== 'PGRST116') { // PGRST116 means no rows found
+                console.error('Database check error:', checkError);
+                return res.status(500).json({ error: 'Failed to check account status' });
+            }
+
+            if (existingAccount) {
+                return res.status(200).json({ 
+                    message: 'Account already linked!',
+                    alreadyLinked: true
+                });
+            }
                 const { error: dbError } = await supabase.from('linked_brokerage_accounts').insert({
                     user_id: userId,
                     provider: 'Schwab',
