@@ -51,7 +51,7 @@ function Profile() {
                 // Transform the accounts data to include relevant details
                 const formattedAccounts = accountsData.map(account => ({
                     id: account.account_id,
-                    name: account.account_name,
+                    name: account.account_provider + "Brokerage Account",
                     type: account.account_type,
                     last4: account.account_number_last4,
                     provider: account.provider,
@@ -71,12 +71,6 @@ function Profile() {
         fetchUser();
     }, [navigate]);
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    };
 
     if (loading) return <div>Loading...</div>;
 
