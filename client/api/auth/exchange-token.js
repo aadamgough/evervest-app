@@ -57,11 +57,18 @@ export default async function handler(req, res) {
     console.log('Exchange token endpoint hit');
     console.log('Request body:', req.body);
     // Handle CORS
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        return res.status(200).end();
+    }
+
+    // Set CORS headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-
-    
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
     }

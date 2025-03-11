@@ -26,7 +26,7 @@ function AuthCallback() {
                 console.log('Received state:', state);
                 
                 // Exchange code for tokens (this should be done server-side)
-                const response = await fetch('/api/auth/exchange-token', {
+                const response = await fetch('https://evervest-app.vercel.app/api/auth/exchange-token', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
