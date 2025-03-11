@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { createClient } from '@supabase/supabase-js';
+
 
 // Create Supabase client
 const supabase = createClient(
