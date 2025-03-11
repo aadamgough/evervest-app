@@ -57,15 +57,19 @@ export default async function handler(req, res) {
     console.log('Exchange token endpoint hit');
     console.log('Request body:', req.body);
 
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError || !session) {
-        console.error('Session error:', sessionError);
-        return res.status(401).json({ error: 'Not authenticated' });
+    // Get the authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ error: 'No authorization header' });
     }
-    
-    const userId = session.user.id;
-    console.log('Authenticated user ID:', userId);
+
+    // Extract user ID from request body
+    const { code, state, userId } = req.body;
+    if (!userId) {
+        return res.status(400).json({ error: 'No user ID provided' });
+    }
+
+    console.log('User ID from request:', userId);
 
     // Handle CORS
     if (req.method === 'OPTIONS') {
@@ -138,7 +142,7 @@ export default async function handler(req, res) {
             }
 
 
-    console.log("Attempting to fetch accounts with token:", tokens.access_token.substring(0, 20) + '...');
+            console.log("Attempting to fetch accounts with token:", tokens.access_token.substring(0, 20) + '...');
 
             // Get account information using the parsed tokens
             const accountsResponse = await fetch('https://api.schwabapi.com/trader/v1/accounts', {

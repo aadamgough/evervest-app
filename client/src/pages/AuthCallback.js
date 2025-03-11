@@ -9,6 +9,10 @@ function AuthCallback() {
     useEffect(() => { 
         const handleCallback = async () => {
             try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    throw new Error('No active session');
+                }
                 console.log('AuthCallback component mounted');
                 console.log('Current URL:', window.location.href);
                 
@@ -31,7 +35,7 @@ function AuthCallback() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ code, state }),
+                    body: JSON.stringify({ code, state, userId: session.user.id }),
                 });
                 
                 if (!response.ok) {
