@@ -111,6 +111,30 @@ export default async function handler(req, res) {
         });
 
         console.log("AFTER THE TOKENRESPONSE!!", tokenResponse);
+
+        // Add this logging
+        const responseText = await tokenResponse.text();
+        console.log("Token Response Body:", responseText);
+        
+        let tokenss;
+        try {
+            tokenss = JSON.parse(responseText);
+            console.log("Parsed tokenss:", tokenss);
+        } catch (parseError) {
+            console.error("Error parsing token response:", parseError);
+            return res.status(500).json({ 
+                error: 'Failed to parse token response',
+                details: responseText
+            });
+        }
+        
+        if (!tokenss.access_token) {
+            console.error("No access token in response:", tokenss);
+            return res.status(400).json({ 
+                error: 'Invalid token response',
+                details: tokenss
+            });
+        }
         
         if (!tokenResponse.ok) {
             const errorData = await tokenResponse.text();
