@@ -17,8 +17,6 @@ function AuthCallback() {
                 const code = params.get('code');
                 const state = params.get('state');
 
-                console.log('Received code:', code);
-                console.log('Received state:', state);
                 
                 if (!code || !state) {
                     throw new Error('No authorization code received');

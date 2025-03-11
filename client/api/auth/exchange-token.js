@@ -7,10 +7,13 @@ const supabase = createClient(
 );
 
 async function refreshToken(refresh_token) {
+    console.log("REFRESH TOKEN FUNCTION CALLED");
     try {
         const authString = Buffer.from(
             `${process.env.REACT_APP_SCHWAB_CLIENT_ID}:${process.env.REACT_APP_SCHWAB_CLIENT_SECRET}`
         ).toString('base64');
+
+        console.log("AUTH STRING inside refreshToken function", authString);
 
         const response = await fetch('https://api.schwabapi.com/v1/oauth/token', {
             method: 'POST',
@@ -23,6 +26,8 @@ async function refreshToken(refresh_token) {
                 refresh_token: refresh_token
             })
         });
+
+        console.log("RESPONSE inside refreshToken function", response);
 
         if (!response.ok) {
             throw new Error('Failed to refresh token');
