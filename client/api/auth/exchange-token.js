@@ -56,6 +56,17 @@ async function refreshToken(refresh_token) {
 export default async function handler(req, res) { 
     console.log('Exchange token endpoint hit');
     console.log('Request body:', req.body);
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+        console.error('Session error:', sessionError);
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    const userId = session.user.id;
+    console.log('Authenticated user ID:', userId);
+
     // Handle CORS
     if (req.method === 'OPTIONS') {
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -156,7 +167,7 @@ export default async function handler(req, res) {
             for (const accountWrapper of accountsData) {
                 const account = accountWrapper.securitiesAccount;
                 const { error: dbError } = await supabase.from('linked_brokerage_accounts').insert({
-                    user_id: state,
+                    user_id: userId,
                     provider: 'Schwab',
                     account_id: account.accountNumber,
                     account_name: `Schwab Account ${account.accountNumber}`,
