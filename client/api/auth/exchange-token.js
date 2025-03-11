@@ -59,8 +59,11 @@ export default async function handler(req, res) {
 
     // Get the authorization header
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ error: 'No authorization header' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ 
+            error: 'No valid authorization header',
+            details: 'Authorization header must be Bearer token'
+        });
     }
 
     // Extract user ID from request body
