@@ -5,11 +5,12 @@ import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import ProfilePreview from '../components/ProfilePreview';
 import '../App.css';
+import '../styles/ProfilePreview.css'; 
 
 function Profile() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [linkedAccounts, setLinkedAccounts] = useState([]); // State for linked bank accounts
+    const [linkedAccounts, setLinkedAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,24 +24,43 @@ function Profile() {
                     return;
                 }
 
-                // Fetch user data for the name and email
+                // Fetch user data
                 const { data: userData, error: userError } = await supabase
                     .from('users')
-                    .select('name, email') // Fetch email as well
+                    .select('name, email')
                     .eq('id', session.user.id)
                     .single();
 
                 if (userError) throw userError;
                 setUser(userData);
 
-                // Fetch linked bank accounts (assuming you have a table for this)
+                // Fetch linked brokerage accounts with more details
                 const { data: accountsData, error: accountsError } = await supabase
-                    .from('linked_brokerage_accounts') // Replace with your actual table name
-                    .select('account_name') // Adjust the field as necessary
+                    .from('linked_brokerage_accounts')
+                    .select(`
+                        account_id,
+                        account_name,
+                        account_type,
+                        account_number_last4,
+                        provider,
+                        metadata
+                    `)
                     .eq('user_id', session.user.id);
 
                 if (accountsError) throw accountsError;
-                setLinkedAccounts(accountsData.map(account => account.account_name)); // Adjust based on your data structure
+
+                // Transform the accounts data to include relevant details
+                const formattedAccounts = accountsData.map(account => ({
+                    id: account.account_id,
+                    name: account.account_name,
+                    type: account.account_type,
+                    last4: account.account_number_last4,
+                    provider: account.provider,
+                    balances: account.metadata?.balances?.current || {},
+                    positions: account.metadata?.positions || []
+                }));
+
+                setLinkedAccounts(formattedAccounts);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -52,6 +72,13 @@ function Profile() {
         fetchUser();
     }, [navigate]);
 
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    };
+
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -61,6 +88,42 @@ function Profile() {
                 <div className="dashboard-content">
                     <div className="action-buttons-container">
                         <ProfilePreview user={user} linkedAccounts={linkedAccounts} />
+                        
+                        {/* Display Linked Accounts */}
+                        <div className="linked-accounts-section">
+                            <h2>Linked Accounts</h2>
+                            {linkedAccounts.map((account) => (
+                                <div key={account.id} className="account-card">
+                                    <h3>{account.name}</h3>
+                                    <p>Account ending in: {account.last4}</p>
+                                    <p>Type: {account.type}</p>
+                                    
+                                    {/* Display Balances */}
+                                    {account.balances && (
+                                        <div className="account-balances">
+                                            <h4>Current Balances</h4>
+                                            <p>Available Funds: {formatCurrency(account.balances.availableFunds || 0)}</p>
+                                            <p>Total Equity: {formatCurrency(account.balances.equity || 0)}</p>
+                                            <p>Buying Power: {formatCurrency(account.balances.buyingPower || 0)}</p>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Display Positions Summary */}
+                                    {account.positions && account.positions.length > 0 && (
+                                        <div className="account-positions">
+                                            <h4>Positions ({account.positions.length})</h4>
+                                            <div className="positions-list">
+                                                {account.positions.map((position, index) => (
+                                                    <div key={index} className="position-item">
+                                                        <p>{position.instrument?.symbol}: {formatCurrency(position.marketValue || 0)}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
