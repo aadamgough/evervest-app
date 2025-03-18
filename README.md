@@ -14,7 +14,7 @@ EverVest is a powerful investment application designed to empower users with too
 
 ## Technologies Used
 
-- **Frontend**: React, React Router, CSS
+- **Frontend**: Javascript, React, React Router, CSS
 - **Backend**: Supabase (for authentication and database)
 - **API Integration**: LLaMA API for investment plan generation
 - **Deployment**: Vercel
