@@ -11,8 +11,6 @@ import ResponseDetail from './pages/ResponseDetail';
 import InvestmentPlan from './pages/InvestmentPlan';
 import Questionnaire from './pages/Questionnaire';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
-import RiskToleranceQuestionnaire from './pages/RiskToleranceQuestionnaire';
-import ESGQuestionnaire from './pages/ESGQuestionnaire';
 import AuthCallback from './pages/AuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
 
