@@ -7,14 +7,9 @@ import '../App.css';
 
 function InvestmentPlan() {
     const navigate = useNavigate();
-    const [selectedOptions, setSelectedOptions] = useState({
-        wealthManagement: false,
-        riskTolerance: false,
-        esgPhilosophy: false
-    });
-
     const [error, setError] = useState('');
     const [user, setUser] = useState();
+    const [hasCompletedQuestionnaire, setHasCompletedQuestionnaire] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -24,16 +19,26 @@ function InvestmentPlan() {
                 if (sessionError) throw sessionError;
                 
                 if (session?.user?.id) {
-                    // Get user profile from your users table
-                    const { data: userData, error: userError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', session.user.id)
-                        .single();
+                    // Get user profile and questionnaire responses
+                    const [userResponse, questionnaireResponse] = await Promise.all([
+                        supabase
+                            .from('users')
+                            .select('*')
+                            .eq('id', session.user.id)
+                            .single(),
+                        supabase
+                            .from('questionnaire_responses')
+                            .select('wmq_answers')
+                            .eq('user_id', session.user.id)
+                            .single()
+                    ]);
 
-                    if (userError) throw userError;
+                    if (userResponse.error) throw userResponse.error;
+                    setUser(userResponse.data);
+
+                    // Check if questionnaire is completed
+                    setHasCompletedQuestionnaire(!!questionnaireResponse.data?.wmq_answers);
                     
-                    setUser(userData);
                 } else {
                     navigate('/');
                 }
@@ -46,105 +51,58 @@ function InvestmentPlan() {
         fetchUser();
     }, [navigate]);
 
-    const toggleOption = (option) => {
-        setSelectedOptions(prev => ({
-            ...prev,
-            [option]: !prev[option]
-        }));
-    };
-
     const handleGeneratePlan = async () => {
         try {
-            // Get session and validate user
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (sessionError) throw sessionError;
             if (!session?.user?.id) {
                 throw new Error('No user logged in');
             }
-    
-            // Log session details for debugging
-            console.log('Session details:', {
-                'User ID': session.user.id,
-                'Token present': !!session.access_token,
-                'Token': session.access_token // Be careful with this in production
-            });
-    
+
             // Get questionnaire responses
-            const { data: responses } = await supabase
+            const { data: responses, error: responseError } = await supabase
                 .from('questionnaire_responses')
-                .select('*')
+                .select('wmq_answers')
                 .eq('user_id', session.user.id)
                 .single();
-    
-            // Validate questionnaire completion
-            const validationErrors = {
-                wealthManagement: selectedOptions.wealthManagement && !responses?.wmq_answers,
-                riskTolerance: selectedOptions.riskTolerance && !responses?.risktol_answers,
-                esgPhilosophy: selectedOptions.esgPhilosophy && !responses?.esg_answers
-            };
-    
-            for (const [type, hasError] of Object.entries(validationErrors)) {
-                if (hasError) {
-                    setError(`Please complete the ${type.replace(/([A-Z])/g, ' $1').trim()} questionnaire first`);
-                    return;
-                }
+
+            if (responseError) throw responseError;
+
+            if (!responses?.wmq_answers) {
+                setError('Please complete the wealth management questionnaire first');
+                return;
             }
-    
+
             // Prepare request body
             const requestBody = {
                 user_id: session.user.id,
-                selected_options: selectedOptions,
                 plan_details: {
-                    ...(selectedOptions.wealthManagement && { wmq_answers: responses.wmq_answers }),
-                    ...(selectedOptions.riskTolerance && { risktol_answers: responses.risktol_answers }),
-                    ...(selectedOptions.esgPhilosophy && { esg_answers: responses.esg_answers })
+                    wmq_answers: responses.wmq_answers
                 }
             };
 
-            console.log('Request body:', requestBody); // Debug log
-    
-            // Log request details
-            console.log('Sending request with:', {
-                endpoint: 'http://localhost:5002/api/generate-plan',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer [token-hidden]'
-                },
-                body: requestBody
-            });
-    
-            // Send request
+            console.log('Request body:', requestBody);
+
             const response = await fetch('/api/investments/generate-plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.access_token}`,
-                    // Add CORS headers
                     'Accept': 'application/json'
                 },
-                credentials: 'include', // Include credentials
+                credentials: 'include',
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('Response:', response);
-    
-            // Handle response
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Server response error:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    error: errorData
-                });
                 throw new Error(errorData.error || 'Failed to generate investment plan');
             }
-    
+
             const data = await response.json();
             console.log('Successfully generated plan:', data);
-    
-            // Navigate to investments page
             navigate('/investments');
-    
+
         } catch (error) {
             console.error('Error in handleGeneratePlan:', error);
             setError('Failed to generate investment plan. Please try again.');
@@ -157,47 +115,32 @@ function InvestmentPlan() {
                 <Navbar isLoggedIn={true}/>
                 <div className="questionnaire-content">
                     <div className="questionnaire-content-inner">
-                        <h1>Investment Plan Generation for  {user ? user.name : 'User'} </h1>
-                        <h2>What would you like to incorporate in your investment plan?</h2>
-                        <p>Choose the data housed in your profile and let Evervest craft a customized investment strategy.</p>
+                        <h1>Investment Plan Generation for {user ? user.name : 'User'}</h1>
+                        <h2>Ready to create your personalized investment strategy?</h2>
+                        <p>Let's use your wealth management profile to craft a customized investment plan.</p>
 
                         <div className="investment-buttons-container">
-                        {error && <div className="error-message" style={{color: 'red'}}>{error}</div>}
-                            <div className="investment-item">
-                                <button 
-                                    className={`investment-btn ${selectedOptions.wealthManagement ? 'selected' : ''}`}
-                                    onClick={() => toggleOption('wealthManagement')}
-                                >
-                                    {selectedOptions.wealthManagement ? '✓ ' : ''}Wealth Management
-                                </button>
-                            </div>
-
-                            <div className="investment-item">
-                                <button 
-                                    className={`investment-btn ${selectedOptions.riskTolerance ? 'selected' : ''}`}
-                                    onClick={() => toggleOption('riskTolerance')}
-                                >
-                                    {selectedOptions.riskTolerance ? '✓ ' : ''}Risk Tolerance
-                                </button>
-                            </div>
-
-                            <div className="investment-item">
-                                <button 
-                                    className={`investment-btn ${selectedOptions.esgPhilosophy ? 'selected' : ''}`}
-                                    onClick={() => toggleOption('esgPhilosophy')}
-                                >
-                                    {selectedOptions.esgPhilosophy ? '✓ ' : ''}ESG Philosophy
-                                </button>
-                            </div>
-
-                            <div className="investment-item">
-                                <button 
-                                    className="generate-btn"
-                                    onClick={handleGeneratePlan}
-                                >
-                                    Generate Investment Plan
-                                </button>
-                            </div>
+                            {error && <div className="error-message" style={{color: 'red'}}>{error}</div>}
+                            
+                            {!hasCompletedQuestionnaire ? (
+                                <div className="investment-item">
+                                    <button 
+                                        className="questionnaire-btn"
+                                        onClick={() => navigate('/questionnaire')}
+                                    >
+                                        Complete Questionnaire
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="investment-item">
+                                    <button 
+                                        className="generate-btn"
+                                        onClick={handleGeneratePlan}
+                                    >
+                                        Generate Investment Plan
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

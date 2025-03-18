@@ -11,9 +11,7 @@ function Responses() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [responses, setResponses] = useState({
-        wmq_answers: null,
-        risktol_answers: null,
-        esg_answers: null
+        wmq_answers: null
     });
 
     useEffect(() => {
@@ -40,7 +38,7 @@ function Responses() {
                 // Then fetch questionnaire responses
                 const { data: responseData, error: responseError } = await supabase
                     .from('questionnaire_responses')
-                    .select('wmq_answers, risktol_answers, esg_answers')
+                    .select('wmq_answers')
                     .eq('user_id', session.user.id)
                     .single();
 
@@ -57,8 +55,8 @@ function Responses() {
         fetchUserAndResponses();
     }, [navigate]);
 
-    const handleResponseClick = (type) => {
-        navigate(`/responses/${type}`);
+    const handleResponseClick = () => {
+        navigate('/responses/wmq_answers');
     };
 
     if (loading) return <div>Loading...</div>;
@@ -75,31 +73,15 @@ function Responses() {
                 <div className="dashboard-content">
                     <div className="welcome-section">
                         <h1>Questionnaire Responses for {user?.name}</h1>
-                        <p className="subtitle">Review and manage your investment profile responses</p>
+                        <p className="subtitle">Review and manage your investment profile</p>
                     </div>
 
                     <div className="action-buttons-container">
-                        <div onClick={() => handleResponseClick('wmq_answers')}>
+                        <div onClick={handleResponseClick}>
                             <ResponsePreview 
-                                title="Wealth Management"
+                                title="Investment Profile Questionnaire"
                                 data={responses.wmq_answers}
                                 completed={responses.wmq_answers !== null}
-                            />
-                        </div>
-
-                        <div onClick={() => handleResponseClick('risktol_answers')}>
-                            <ResponsePreview 
-                                title="Risk Tolerance"
-                                data={responses.risktol_answers}
-                                completed={responses.risktol_answers !== null}
-                            />
-                        </div>
-
-                        <div onClick={() => handleResponseClick('esg_answers')}>
-                            <ResponsePreview 
-                                title="ESG Philosophy"
-                                data={responses.esg_answers}
-                                completed={responses.esg_answers !== null}
                             />
                         </div>
                     </div>

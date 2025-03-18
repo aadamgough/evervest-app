@@ -1,29 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import '../App.css';
 
 function ResponseDetail() {
-    const { type } = useParams();
     const navigate = useNavigate();
     const [responses, setResponses] = useState(null);
+    const [originalResponses, setOriginalResponses] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const getQuestionnaireTitle = () => {
-        switch(type) {
-            case 'wmq_answers':
-                return 'Wealth Management Questionnaire';
-            case 'risktol_answers':
-                return 'Risk Tolerance Assessment';
-            case 'esg_answers':
-                return 'ESG Philosophy Survey';
-            default:
-                return 'Questionnaire Responses';
-        }
-    };
+    const [hasChanges, setHasChanges] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchResponses = async () => {
@@ -36,12 +25,13 @@ function ResponseDetail() {
 
                 const { data, error } = await supabase
                     .from('questionnaire_responses')
-                    .select(type)
+                    .select('wmq_answers')
                     .eq('user_id', session.user.id)
                     .single();
 
                 if (error) throw error;
-                setResponses(data[type]);
+                setResponses(data.wmq_answers);
+                setOriginalResponses(JSON.stringify(data.wmq_answers));
 
             } catch (err) {
                 console.error('Error:', err);
@@ -52,24 +42,46 @@ function ResponseDetail() {
         };
 
         fetchResponses();
-    }, [type, navigate]);
+    }, [navigate]);
 
-    const handleAnswerUpdate = async (question, newAnswer) => { //HAVEN'T CHECKED IF THIS WORKS
+    // Check for changes whenever responses are updated
+    useEffect(() => {
+        if (responses && originalResponses) {
+            const hasChanged = JSON.stringify(responses) !== originalResponses;
+            setHasChanges(hasChanged);
+        }
+    }, [responses, originalResponses]);
+
+    const handleAnswerUpdate = (question, newAnswer) => {
+        const updatedResponses = { ...responses, [question]: newAnswer };
+        setResponses(updatedResponses);
+    };
+
+    const handleSubmit = async () => {
         try {
+            setIsSubmitting(true);
             const { data: { session } } = await supabase.auth.getSession();
-            const updatedResponses = { ...responses, [question]: newAnswer };
-
+            
             const { error } = await supabase
                 .from('questionnaire_responses')
-                .update({ [type]: updatedResponses })
+                .update({ wmq_answers: responses })
                 .eq('user_id', session.user.id);
 
             if (error) throw error;
-            setResponses(updatedResponses);
+            
+            // Update original responses to match current responses
+            setOriginalResponses(JSON.stringify(responses));
+            setHasChanges(false);
+            
+            // Show success message
+            alert('Responses updated successfully!');
 
         } catch (err) {
-            console.error('Error updating answer:', err);
-            setError('Failed to update answer');
+            console.error('Error updating answers:', err);
+            setError('Failed to update answers');
+            alert('Failed to update responses. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -81,13 +93,20 @@ function ResponseDetail() {
             <div className="ResponseDetail">
                 <Navbar isLoggedIn={true} />
                 <div className="detail-header">
-                        <button className="back-button" onClick={() => navigate('/responses')}>
-                            ← Responses
-                        </button>
-                    </div>
+                    <button className="back-button" onClick={() => navigate('/responses')}>
+                        ← Responses
+                    </button>
+                </div>
                 <div className="detail-content">
-                    <div className="detail-header">
-                        <h1>{getQuestionnaireTitle()}</h1>
+                    <div className="detail-header-with-submit">
+                        <h1>Investment Profile Questionnaire</h1>
+                        <button 
+                            className={`submit-button ${hasChanges ? 'active' : ''} ${isSubmitting ? 'submitting' : ''}`}
+                            onClick={handleSubmit}
+                            disabled={!hasChanges || isSubmitting}
+                        >
+                            {isSubmitting ? 'Updating...' : 'Submit Changes'}
+                        </button>
                     </div>
 
                     <div className="answers-container">

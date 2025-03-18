@@ -41,24 +41,6 @@ function Questionnaire() {
                                 Wealth Management
                             </button>
                         </div>
-
-                        <div className="questionnaire-item">
-                            <button 
-                                className="questionnaire-btn"
-                                onClick={() => navigate('/questionnaire/risk')}
-                            >
-                                Risk Tolerance
-                            </button>
-                        </div>
-
-                        <div className="questionnaire-item">
-                            <button 
-                                className="questionnaire-btn"
-                                onClick={() => navigate('/questionnaire/esg')}
-                            >
-                                ESG Philosophy
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
