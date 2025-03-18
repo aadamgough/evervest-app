@@ -36,8 +36,6 @@ function App() {
         <Route path="/responses/:type" element={<ResponseDetail />} />
         <Route path = "/investmentplan" element={<InvestmentPlan/>} />
         <Route path="/questionnaire/wealth" element={<WealthQuestionnaire />} />
-        <Route path="/questionnaire/risk" element={<RiskToleranceQuestionnaire />} />
-        <Route path="/questionnaire/esg" element={<ESGQuestionnaire />} />
       </Routes>
     </Router>
     </AnimatePresence>
