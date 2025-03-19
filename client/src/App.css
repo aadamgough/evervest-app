@@ -853,7 +853,7 @@ body {
   border-radius: 6px;
   border: none;
   background-color: #88494c;
-  opacity: 0.6;
+  opacity: 0.75;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -862,6 +862,8 @@ body {
 
 .action-button:hover {
   background-color: #88494c;
+  opacity: 1;
+
 }
 
 .action-button:disabled {
@@ -926,7 +928,7 @@ body {
 }
 
 .edit-responses-btn:hover {
-  background-color: #2563eb;
+  background-color: #2E4636;
   color: white;
 }
 
