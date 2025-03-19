@@ -66,21 +66,35 @@ function Investments() {
 
     const handleGeneratePlan = async () => {
         try {
-            setIsGeneratingPlan(true);
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            const { data: responses } = await supabase
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) throw sessionError;
+            if (!session?.user?.id) {
+                throw new Error('No user logged in');
+            }
+
+            // Get questionnaire responses
+            const { data: responses, error: responseError } = await supabase
                 .from('questionnaire_responses')
                 .select('wmq_answers')
                 .eq('user_id', session.user.id)
                 .single();
 
+            if (responseError) throw responseError;
+
+            if (!responses?.wmq_answers) {
+                setError('Please complete the wealth management questionnaire first');
+                return;
+            }
+
+            // Prepare request body
             const requestBody = {
                 user_id: session.user.id,
                 plan_details: {
                     wmq_answers: responses.wmq_answers
                 }
             };
+
+            console.log('Request body:', requestBody);
 
             const response = await fetch('/api/investments/generate-plan', {
                 method: 'POST',
@@ -99,13 +113,12 @@ function Investments() {
             }
 
             const data = await response.json();
-            window.location.reload(); // Refresh to show new plan
+            console.log('Successfully generated plan:', data);
+            navigate('/investments');
 
         } catch (error) {
             console.error('Error in handleGeneratePlan:', error);
             setError('Failed to generate investment plan. Please try again.');
-        } finally {
-            setIsGeneratingPlan(false);
         }
     };
 
