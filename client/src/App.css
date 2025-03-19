@@ -720,7 +720,7 @@ body {
 .account-name {
   font-weight: 600;
   color: #1a1a1a;
-  margin-bottom: 0.25rem;
+  margin-bottom: 10px;
 }
 
 .account-number {
@@ -777,6 +777,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 10px;
 }
 
 
