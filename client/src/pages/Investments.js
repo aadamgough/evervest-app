@@ -110,11 +110,19 @@ function Investments() {
     };
 
     const formatPlanContent = (planContent) => {
-        const sections = planContent.split(/\n\s*\n/);
+        // Split the content into sections based on newlines
+        const sections = planContent.split(/\n\s*\n/); // Split on one or more newlines
+    
         return sections.map((section, index) => {
-            if (section.trim().length === 0) return null;
+            if (section.trim().length === 0) return null; // Skip empty sections
+            
+            // Fix this
+            const isHeader = section.toUpperCase() === section || section.includes(':');
+    
+            console.log("this is the section",section);
+            
             return (
-                <div key={index} className="plan-section">
+                <div key={index} className="plan-header">
                     {section}
                 </div>
             );

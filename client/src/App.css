@@ -785,13 +785,13 @@ body {
 }
 
 .submit-button.active {
-  background-color: #2563eb;
+  background-color: #2E4636;
   color: white;
   cursor: pointer;
 }
 
 .submit-button.active:hover {
-  background-color: #1d4ed8;
+  background-color: #2E4636;
 }
 
 .submit-button.submitting {
@@ -809,7 +809,7 @@ body {
 }
 
 .answer-input:focus {
-  border-color: #2563eb;
+  border-color: #2E4636;
   outline: none;
 }
 
@@ -841,7 +841,7 @@ body {
 }
 
 .action-card h2 {
-  color: #2563eb;
+  color: #2E4636;
   margin-bottom: 1rem;
   font-size: 1.25rem;
 }
@@ -856,7 +856,7 @@ body {
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   border: none;
-  background-color: #2563eb;
+  background-color: #88494c;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -864,11 +864,11 @@ body {
 }
 
 .action-button:hover {
-  background-color: #1d4ed8;
+  background-color: #2E4636;
 }
 
 .action-button:disabled {
-  background-color: #93c5fd;
+  background-color: #2E4636;
   cursor: not-allowed;
 }
 
