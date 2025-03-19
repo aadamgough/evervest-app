@@ -63,11 +63,28 @@ export default async function handler(req, res) {
         }
 
         // Format the prompt for LLaMA API
-        let prompt = 'I am a financial advisor seeking an optimized investment plan for a client based ' +
-            'on their financial situation, risk tolerance, and investment goals. ' +
-            'Provide a strategic investment plan for the client, including allocation ' +
-            'percentages, accounts they should open, and reasoning.';
+        const prompt = `
+        # CONTEXT #
+        You are a financial advisor seeking an optimized investment plan for a client. You will be given a list of client responses to a questionnaire 
+        that deals with their financial situation, risk tolerance, and investment goals.
+
+        # OBJECTIVE #
+        Your goal is to use this information to build a personalized investment plan for the client, that includes investment accounts they should open
+        and the allocation of their assets across those accounts. You need to take in every question that the client answered and use it to build the plan;
+        this is important.
+
+        # STYLE #
+        The investment plan needs to be clear and concise, and should be written in a way that is easy to understand. There should be very brief explanations
+        of the reasoning behind the investment plan before the specific accounts and their holdings are generated. When referencing the client, refer to them
+        as 'you' or 'your'. 
         
+        For every account, provide the client with an asset allocation with percentages for each asset class. This part should be very concise.
+
+        # OUTPUT #
+        The output should be a list of investment accounts the client should open, and the allocation of their assets across those accounts.
+
+        `;
+
         // Add questionnaire responses to prompt
         if (selected_options.wealthManagement && plan_details?.wmq_answers) {
             prompt += "\nWealth Management Responses:\n";

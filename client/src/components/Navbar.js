@@ -66,7 +66,6 @@ const Navbar = ({ isLoggedIn }) => {
                                         <Link to="/faq">FAQ</Link>
                                     </div>
                                 </div>
-                                <Link to="/enterprise" className="nav-text-link">Enterprise</Link>
                                 <Link to="/pricing" className="nav-text-link">Pricing</Link>
                             </div>
                             <div className="nav-actions" style={{ marginLeft: 'auto' }}>

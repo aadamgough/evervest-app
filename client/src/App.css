@@ -586,15 +586,15 @@ body {
   transition: all 0.2s ease;
 }
 
-.edit-button:hover {
+.action-button:hover {
   background-color: #88494c;
   color: white;
 }
 
-/* .action-button:disabled {
+.action-button:disabled {
   background-color: #88494c;
   cursor: not-allowed;
-} */
+}
 
 .warning-text {
   color: #dc2626;

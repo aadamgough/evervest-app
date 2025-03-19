@@ -94,7 +94,7 @@ function ResponseDetail() {
                 <Navbar isLoggedIn={true} />
                 <div className="detail-header">
                     <button className="back-button" onClick={() => navigate('/investments')}>
-                        ← Responses
+                        ← Back
                     </button>
                 </div>
                 <div className="detail-content">
