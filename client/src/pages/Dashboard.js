@@ -72,22 +72,6 @@ function Dashboard() {
                 </div>
 
                 <div className="action-buttons-container">
-                    <div className="action-item">
-                        <div className="action-description">
-                            <p>
-                            Discover your unique investment path. Take a quick 
-                            questionnaire tailored to your needs—whether it's 
-                            wealth management, risk tolerance, or ESG preferences—and 
-                            get personalized insights to guide your financial future.
-                            </p>
-                        </div>
-                        <button 
-                            className="dashboard-btn"
-                            onClick={() => navigate('/questionnaire')}
-                        >
-                            Go to Questionnaires
-                        </button>
-                    </div>
 
                     <div className="action-item">
                         <div className="action-description">
@@ -102,22 +86,6 @@ function Dashboard() {
                             onClick={() => navigate('/responses')}
                         >
                             View my Responses
-                        </button>
-                    </div>
-
-                    <div className="action-item">
-                        <div className="action-description">
-                            <p>
-                            Ready to build an investment plan personalized to your data?
-                            Generate custom portfolios for a range of account types, approved
-                            and optimized by Evervest's financial advisors.
-                            </p>
-                        </div>
-                        <button 
-                            className="dashboard-btn"
-                            onClick={() => navigate('/InvestmentPlan')}
-                        >
-                            Generate Investment Plan
                         </button>
                     </div>
                 </div>

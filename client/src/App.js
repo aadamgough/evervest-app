@@ -8,8 +8,6 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Responses from './pages/Responses';
 import ResponseDetail from './pages/ResponseDetail';
-import InvestmentPlan from './pages/InvestmentPlan';
-import Questionnaire from './pages/Questionnaire';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
 import AuthCallback from './pages/AuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
@@ -29,10 +27,8 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/questionnaire" element={<Questionnaire />} />
         <Route path="/responses" element={<Responses />} />
         <Route path="/responses/:type" element={<ResponseDetail />} />
-        <Route path = "/investmentplan" element={<InvestmentPlan/>} />
         <Route path="/questionnaire/wealth" element={<WealthQuestionnaire />} />
       </Routes>
     </Router>
