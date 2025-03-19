@@ -649,10 +649,6 @@ body {
   margin: 0 auto;
 }
 
-.detail-header {
-  text-align: center;
-}
-
 .back-button {
   position: absolute;
   left: 2rem;
@@ -841,13 +837,13 @@ body {
 }
 
 .action-card h2 {
-  color: #2E4636;
+  color: #1a1a1a;
   margin-bottom: 1rem;
   font-size: 1.25rem;
 }
 
 .action-card p {
-  color: #4b5563;
+  color: #1a1a1a;
   margin-bottom: 1.5rem;
   flex-grow: 1;
 }
@@ -908,6 +904,29 @@ body {
   border-radius: 6px;
   background-color: #fee2e2;
   margin-bottom: 1rem;
+}
+
+.questionnaire-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.edit-responses-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #2563eb;
+  background-color: transparent;
+  color: #2563eb;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-responses-btn:hover {
+  background-color: #2563eb;
+  color: white;
 }
 
 

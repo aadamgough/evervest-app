@@ -141,7 +141,17 @@ function Investments() {
                     <div className="action-cards">
                         {/* Questionnaire Card */}
                         <div className="action-card questionnaire-card">
+                            <div className="questionnaire-card-header">
                             <h2>Investment Profile Questionnaire</h2>
+                                {hasCompletedQuestionnaire && (
+                                    <button
+                                        className="edit-responses-btn"
+                                        onClick={() => navigate('/responses/wmq_answers')}
+                                    >
+                                        Edit Responses
+                                    </button>
+                                )}
+                            </div>
                             <p>
                                 Discover your ideal investment strategy through our advanced questionnaire
                                 powered by machine learning.

@@ -6,7 +6,6 @@ import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import Responses from './pages/Responses';
 import ResponseDetail from './pages/ResponseDetail';
 import WealthQuestionnaire from './pages/WealthQuestionnaire';
 import AuthCallback from './pages/AuthCallback';
@@ -27,7 +26,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/responses" element={<Responses />} />
         <Route path="/responses/:type" element={<ResponseDetail />} />
         <Route path="/questionnaire/wealth" element={<WealthQuestionnaire />} />
       </Routes>
