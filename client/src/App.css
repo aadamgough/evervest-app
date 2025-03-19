@@ -376,272 +376,6 @@ body {
   color: #666;
 }
 
-.action-buttons-container {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  gap: 40px;
-  max-width: 100%;
-  margin: 40px auto;
-  transition: all 0.3s ease-in-out;
-}
-
-.action-item {
-  background-color: #f8f9fa;
-  display: center;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.action-description {
-  margin-bottom: 20px;
-}
-
-.action-description p {
-  font-size: 1.1em;
-  line-height: 1.5;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.dashboard-btn {
-  padding: 15px 30px;
-  font-size: 1.2em;
-  background-color: #2E4636;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  max-width: 300px;
-  transition: all 0.3s ease-in-out;
-}
-
-.dashboard-btn:hover {
-  background-color: #2E4636;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Questionnaire Page Styles */
-.Questionnaire {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.questionnaire-content {
-  flex: 1;
-  padding: 40px;
-  max-width: 80%;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  margin: 0 auto;
-}
-
-.questionnaire-content-inner h1{
-  font-size: 2.5em;
-  margin-bottom: 100px;
-  color: #333;
-  justify-content: space-evenly;
-  justify-content: center;
-  align-items: center;
-  width: 100%; 
-}
-
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: none;
-  border: none;
-  color: #2E4636;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.back-button:hover {
-  color: #2E4636;
-}
-
-.questionnaire-buttons-container {
-  display: flex;
-  flex-direction: row;
-  gap: 1vh;
-  justify-content: space-evenly;
-  margin: 0 auto;
-  padding-top: 10vh;
-}
-
-.investment-buttons-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1vh;
-  justify-content: space-evenly;
-  margin: 0 auto;
-  padding-top: 10vh;
-}
-
-.questionnaire-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.investment-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.questionnaire-btn {
-  width: 100%;
-  padding: 20px;
-  font-size: 1.3em;
-  background-color: #2E4636;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 15px;
-  transition: all 0.3s ease-in-out;
-}
-
-.investment-btn {
-  width: 100%;
-  padding: 20px;
-  font-size: 1.3em;
-  color: #88494c;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 15px;
-  transition: all 0.3s ease-in-out;
-}
-
-.questionnaire-btn:hover {
-  background-color: #2E4636;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.investment-btn:hover {
-  background-color: rgba(76, 175, 80, 0.1);
-}
-
-.investment-btn.selected {
-  background-color: #2E4636;
-  color: white;
-}
-
-.generate-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  background-color: #88494c;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 400px;
-  margin: 10px;
-}
-
-.questionnaire-description {
-  color: #666;
-  font-size: 1.1em;
-  line-height: 1.5;
-  max-width: 600px;
-}
-
-/* ResponsePreview Page Styles */
-.responses-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.response-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 450px;
-  width: 370px;
-  cursor: pointer;
-}
-
-.response-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-}
-
-.card-image-container {
-  position: relative;
-  height: 66%;
-  overflow: hidden;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.response-card:hover .card-image {
-  transform: scale(1.05);
-}
-
-.completion-badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.9);
-  color: #2E4636;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-content {
-  padding: 1.5rem;
-  height: 34%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; 
-  align-items: center; 
-  text-align: center;
-}
-
-.card-title {
-  margin: 0 0 0.5rem 0;
-  color: #333;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.card-description {
-  color: #666;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
 /* ResponseDetail Page Styling */
 .detail-content {
   padding: 2rem;
@@ -745,13 +479,6 @@ body {
   margin-top: 1rem;
 }
 
-.loading-spinner {
-  text-align: center;
-  padding: 2rem;
-  color: var(--primary-color);
-  font-size: 1.2rem;
-}
-
 .error-message {
   background: var(--error-color, #ff4444);
   color: white;
@@ -849,21 +576,19 @@ body {
 }
 
 .action-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  border: none;
-  background-color: #88494c;
-  opacity: 0.75;
-  color: white;
-  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #88494c;
+  background-color: transparent;
+  color: #88494c;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.action-button:hover {
+.edit-button:hover {
   background-color: #88494c;
-  opacity: 1;
-
+  color: white;
 }
 
 .action-button:disabled {
@@ -930,6 +655,122 @@ body {
 .edit-responses-btn:hover {
   background-color: #2E4636;
   color: white;
+}
+
+/* Name fade animation */
+.user-name {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.user-name.visible {
+  opacity: 1;
+}
+
+/* Linked accounts styling */
+.linked-accounts-section {
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.account-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.account-card:hover {
+  transform: translateY(-2px);
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.broker-logo {
+  height: 24px;
+  object-fit: contain;
+}
+
+.account-type {
+  font-size: 0.875rem;
+  color: #666;
+  background: #f3f4f6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.account-details {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.account-name {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.account-number {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.balance-details {
+  margin-top: 1rem;
+}
+
+.balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.balance-item span {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.balance-item strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.no-accounts-message {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.link-account-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.link-account-button:hover {
+  background: #1d4ed8;
 }
 
 
