@@ -134,6 +134,12 @@ function InvestmentPlan() {
                             ) : (
                                 <div className="investment-item">
                                     <button 
+                                        className="questionnaire-btn"
+                                        onClick={() => navigate('/questionnaire')}
+                                    >
+                                        Retake Questionnaire
+                                    </button>
+                                    <button 
                                         className="generate-btn"
                                         onClick={handleGeneratePlan}
                                     >

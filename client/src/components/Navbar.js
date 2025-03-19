@@ -34,7 +34,7 @@ const Navbar = ({ isLoggedIn }) => {
                                 <div className="dropdown">
                                     <Link to="/investments" className="nav-text-link">Investments</Link>
                                 </div>
-                                <Link to="/questionnaire" className="nav-text-link">Questionnaires</Link>
+                                <Link to="/questionnaire" className="nav-text-link">Questionnaire</Link>
                             </div>
                             <div className="nav-actions" style={{ marginLeft: 'auto' }}>
                                 <div className="dropdown">
