@@ -12,6 +12,8 @@ function Investments() {
     const [user, setUser] = useState(null);
     const [hasCompletedQuestionnaire, setHasCompletedQuestionnaire] = useState(false);
     const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+    const [isPlanLoading, setIsPlanLoading] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
