@@ -66,6 +66,10 @@ function Investments() {
 
     const handleGeneratePlan = async () => {
         try {
+            setIsPlanLoading(true);
+            setIsGeneratingPlan(true);
+            setError('');
+
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (sessionError) throw sessionError;
             if (!session?.user?.id) {
@@ -86,15 +90,12 @@ function Investments() {
                 return;
             }
 
-            // Prepare request body
             const requestBody = {
                 user_id: session.user.id,
                 plan_details: {
                     wmq_answers: responses.wmq_answers
                 }
             };
-
-            console.log('Request body:', requestBody);
 
             const response = await fetch('/api/investments/generate-plan', {
                 method: 'POST',
@@ -114,11 +115,26 @@ function Investments() {
 
             const data = await response.json();
             console.log('Successfully generated plan:', data);
-            navigate('/investments');
+
+            // Fetch the newly generated plan
+            const { data: newPlan, error: planError } = await supabase
+                .from('investment_plans')
+                .select('plan_details, created_at')
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (planError) throw planError;
+            
+            setPlan(newPlan.plan_details.generated_plan);
 
         } catch (error) {
             console.error('Error in handleGeneratePlan:', error);
             setError('Failed to generate investment plan. Please try again.');
+        } finally {
+            setIsGeneratingPlan(false);
+            setIsPlanLoading(false);
         }
     };
 
@@ -129,9 +145,7 @@ function Investments() {
         return sections.map((section, index) => {
             if (section.trim().length === 0) return null; // Skip empty sections
             
-            // Fix this
-            const isHeader = section.toUpperCase() === section || section.includes(':');
-    
+                
             console.log("this is the section",section);
             
             return (
@@ -205,7 +219,12 @@ function Investments() {
                                 {error}
                             </div>
                         )}
-                        {plan ? (
+                        {isPlanLoading ? (
+                            <div className="plan-loading">
+                                <div className="loading-spinner"></div>
+                                <p>Generating your investment plan...</p>
+                            </div>
+                        ) : plan ? (
                             <div className="plan-card">
                                 {formatPlanContent(plan)}
                             </div>
