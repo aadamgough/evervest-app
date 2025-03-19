@@ -159,6 +159,7 @@ function Investments() {
                             <button 
                                 className="action-button"
                                 onClick={() => navigate('/questionnaire/wealth')}
+                                disabled={!hasCompletedQuestionnaire || isGeneratingPlan}
                             >
                                 {hasCompletedQuestionnaire ? 'Retake Questionnaire' : 'Start Questionnaire'}
                             </button>
