@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabaseClient';
 import PageTransition from '../PageTransition';
 import Navbar from '../components/Navbar';
 import '../App.css';
-import schwabLogo from '../assets/schwab-logo.png'; // Make sure to add this logo to your assets
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -106,7 +105,7 @@ function Dashboard() {
                                 <div key={account.account_id} className="account-card">
                                     <div className="account-header">
                                         <img 
-                                            src={schwabLogo} 
+                                            src='https://res.cloudinary.com/dmsgmyybq/image/upload/v1742358706/Charles_Schwab_Corporation_logo.svg_kvxw99.png' 
                                             alt="Charles Schwab" 
                                             className="broker-logo"
                                         />
