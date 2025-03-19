@@ -76,19 +76,6 @@ export default async function handler(req, res) {
             });
         }
 
-        if (selected_options.riskTolerance && plan_details?.risktol_answers) {
-            prompt += "\nRisk Tolerance Responses:\n";
-            Object.entries(plan_details.risktol_answers).forEach(([question, answer]) => {
-                prompt += `${question}: ${answer}\n`;
-            });
-        }
-
-        if (selected_options.esgPhilosophy && plan_details?.esg_answers) {
-            prompt += "\nESG Philosophy Responses:\n";
-            Object.entries(plan_details.esg_answers).forEach(([question, answer]) => {
-                prompt += `${question}: ${answer}\n`;
-            });
-        }
 
         // Call LLaMA API
         const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {

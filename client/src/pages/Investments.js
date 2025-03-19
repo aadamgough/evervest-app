@@ -94,6 +94,9 @@ function Investments() {
 
             const requestBody = {
                 user_id: session.user.id,
+                selected_options: {
+                    wealthManagement: true 
+                },
                 plan_details: {
                     wmq_answers: responses.wmq_answers
                 }
