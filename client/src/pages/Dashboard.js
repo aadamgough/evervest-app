@@ -53,7 +53,7 @@ function Dashboard() {
                 if (userData.error) throw userData.error;
                 
                 setUser(userData.data);
-                setTimeout(() => setNameLoaded(true), 100); // Trigger fade animation
+                setTimeout(() => setNameLoaded(true), 100);
 
                 if (!accountsData.error) {
                     setLinkedAccounts(accountsData.data);
@@ -99,20 +99,22 @@ function Dashboard() {
                     </div>
 
                     <div className="linked-accounts-section">
-                        <h2>Linked Accounts</h2>
+                        <h2>Investment Accounts</h2>
                         <div className="accounts-grid">
                             {linkedAccounts.map(account => (
                                 <div key={account.account_id} className="account-card">
                                     <div className="account-header">
-                                        <img 
-                                            src='https://res.cloudinary.com/dmsgmyybq/image/upload/v1742358706/Charles_Schwab_Corporation_logo.svg_kvxw99.png' 
-                                            alt="Charles Schwab" 
-                                            className="broker-logo"
-                                        />
+                                        <div className="row">
+                                            <img 
+                                                src='https://res.cloudinary.com/dmsgmyybq/image/upload/v1742358706/Charles_Schwab_Corporation_logo.svg_kvxw99.png' 
+                                                alt="Charles Schwab" 
+                                                className="broker-logo"
+                                            />
+                                            <p className="account-name">{account.provider} Brokerage Account</p>
+                                        </div>
                                         <span className="account-type">{account.account_type}</span>
                                     </div>
                                     <div className="account-details">
-                                        <p className="account-name">{account.account_name}</p>
                                         <p className="account-number">•••• {account.account_number_last4}</p>
                                         {account.metadata?.balances?.current && (
                                             <div className="balance-details">

@@ -773,6 +773,12 @@ body {
   background: #1a1a1a;
 }
 
+.row{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 
 
 @media (prefers-reduced-motion: no-preference) {
