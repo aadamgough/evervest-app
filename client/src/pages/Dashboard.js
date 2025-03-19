@@ -73,21 +73,7 @@ function Dashboard() {
 
                 <div className="action-buttons-container">
 
-                    <div className="action-item">
-                        <div className="action-description">
-                            <p>
-                            Review your personalized insights and track how your 
-                            preferences shape your investment strategy. Access your 
-                            responses anytime to stay aligned with your financial goals.
-                            </p>
-                        </div>
-                        <button 
-                            className="dashboard-btn"
-                            onClick={() => navigate('/responses')}
-                        >
-                            View my Responses
-                        </button>
-                    </div>
+            
                 </div>
             </div>
         </div>
