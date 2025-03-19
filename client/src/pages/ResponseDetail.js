@@ -93,7 +93,7 @@ function ResponseDetail() {
             <div className="ResponseDetail">
                 <Navbar isLoggedIn={true} />
                 <div className="detail-header">
-                    <button className="back-button" onClick={() => navigate('/responses')}>
+                    <button className="back-button" onClick={() => navigate('/investments')}>
                         ← Responses
                     </button>
                 </div>
