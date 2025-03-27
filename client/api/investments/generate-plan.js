@@ -110,54 +110,34 @@ export default async function handler(req, res) {
                 prompt += `${question}: ${answer}\n`;
             });
         }
-
-
-        // // Call LLaMA API
-        // const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Authorization': `Bearer ${process.env.LLAMA_API_KEY}`,
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         model: "llama3-70b",  
-        //         messages: [{
-        //             role: "user",
-        //             content: prompt
-        //         }],
-        //         temperature: 0.7,
-        //         max_tokens: null,         
-        //         top_p: 1,                 
-        //         frequency_penalty: 0.0,
-        //         presence_penalty: 0.0,
-        //         stream: false,          
-        //         n: 1                  
-        //     })
-        // });
-
-
-        // console.log('LLaMA API response:', llamaResponse);
-
-        const testRequest = {
-            model: "llama-2-70b-chat",
-            messages: [{
-                role: "user",
-                content: "Generate a simple investment plan."
-            }],
-            temperature: 0.7,
-            max_tokens: 1024
-        };
         
-        console.log('Testing simple request:', JSON.stringify(testRequest, null, 2));
-        
+        console.log('API Key exists:', !!process.env.LLAMA_API_KEY);
+        console.log('API Key first few characters:', process.env.LLAMA_API_KEY ? process.env.LLAMA_API_KEY.substring(0, 4) + '...' : 'no key');
+
+        // Call LLaMA API
         const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.LLAMA_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(testRequest)
+            body: JSON.stringify({
+                model: "llama3-70b",  
+                messages: [{
+                    role: "user",
+                    content: prompt
+                }],
+                temperature: 0.7,
+                max_tokens: null,         
+                top_p: 1,                 
+                frequency_penalty: 0.0,
+                presence_penalty: 0.0,
+                stream: false,          
+                n: 1                  
+            })
         });
+
+        console.log('LLaMA API response:', llamaResponse);
 
         if (!llamaResponse.ok) {
             console.error('LLaMA API error status:', llamaResponse.status);
