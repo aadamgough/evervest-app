@@ -64,25 +64,43 @@ export default async function handler(req, res) {
 
         // Format the prompt for LLaMA API
         let prompt = `
-        # CONTEXT #
-        You are a financial advisor seeking an optimized investment plan for a client. You will be given a list of client responses to a questionnaire 
-        that deals with their financial situation, risk tolerance, and investment goals.
+        CONTEXT
+        You are an experienced financial advisor specializing in personalized investment strategies. You have received a detailed questionnaire with the client's financial situation, risk tolerance, and investment goals. Your task is to analyze their responses and create an optimized investment plan tailored to their needs.
 
-        # OBJECTIVE #
-        Your goal is to use this information to build a personalized investment plan for the client, that includes investment accounts they should open
-        and the allocation of their assets across those accounts. You need to take in every question that the client answered and use it to build the plan;
-        this is important.
+        OBJECTIVE
+        Your goal is to generate a clear, well-structured investment plan that:
 
-        # STYLE #
-        The investment plan needs to be clear and concise, and should be written in a way that is easy to understand. There should be very brief explanations
-        of the reasoning behind the investment plan before the specific accounts and their holdings are generated. When referencing the client, refer to them
-        as 'you' or 'your'. 
-        
-        For every account, provide the client with an asset allocation with percentages for each asset class. This part should be very concise.
+        Identifies the specific types of investment accounts the client should open (e.g., taxable brokerage, Roth IRA, traditional IRA, 401(k)).
 
-        # OUTPUT #
-        The output should be a list of investment accounts the client should open, and the allocation of their assets across those accounts.
+        Allocates assets within those accounts based on the client’s risk profile and investment goals.
 
+        Incorporates all available client information when constructing the plan—every answered question must inform the recommendations.
+
+        STYLE & CLARITY
+        The investment plan must be clear, concise, and easy to understand.
+
+        Provide a brief explanation of the strategy before listing accounts and allocations. Keep explanations minimal but informative.
+
+        Use direct language and refer to the client as "you" or "your" (e.g., "You should open a Roth IRA and allocate 60% to equities...").
+
+        Ensure the recommendations are actionable, avoiding vague or general advice.
+
+        OUTPUT FORMAT
+        The response should be structured as follows:
+
+        Investment Strategy Overview (2-3 sentences summarizing the reasoning behind the allocation based on the client's responses)
+
+        Recommended Accounts & Asset Allocation (List of accounts, each with a percentage breakdown of asset allocation)
+
+        Account Name (e.g., Roth IRA, 401(k))
+
+        Asset Class 1: X%
+
+        Asset Class 2: Y%
+
+        Asset Class 3: Z%
+
+        Ensure that the total allocation across all accounts adds up to 100%.
         `;
 
         // Add questionnaire responses to prompt
