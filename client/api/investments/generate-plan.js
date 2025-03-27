@@ -120,13 +120,18 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: "llama3.2-3b",
+                model: "llama3-70b",  // Using a larger model
                 messages: [{
                     role: "user",
                     content: prompt
                 }],
                 temperature: 0.7,
-                max_tokens: 2000
+                max_tokens: 4000,         
+                top_p: 1,                 
+                frequency_penalty: 0.0,
+                presence_penalty: 0.0,
+                stream: false,          
+                n: 1                  
             })
         });
 
