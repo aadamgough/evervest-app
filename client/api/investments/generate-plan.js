@@ -72,7 +72,7 @@ export default async function handler(req, res) {
 
         Identifies the specific types of investment accounts the client should open (e.g., taxable brokerage, Roth IRA, traditional IRA, 401(k)).
 
-        Allocates assets within those accounts based on the client’s risk profile and investment goals.
+        Allocates assets within those accounts based on the clients risk profile and investment goals.
 
         Incorporates all available client information when constructing the plan—every answered question must inform the recommendations.
 
