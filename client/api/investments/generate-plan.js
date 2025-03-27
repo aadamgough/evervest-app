@@ -130,6 +130,8 @@ export default async function handler(req, res) {
             })
         });
 
+        console.log('LLaMA API response:', llamaResponse);
+
         if (!llamaResponse.ok) {
             console.error('LLaMA API error status:', llamaResponse.status);
             const errorText = await llamaResponse.text();
