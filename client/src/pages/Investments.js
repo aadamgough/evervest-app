@@ -102,8 +102,7 @@ function Investments() {
                 }
             };
 
-            const response = await fetch('/api/investments/generate-plan', {
-                method: 'POST',
+            const response = await fetch('/api/investments/generate-plan', { 
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.access_token}`,
