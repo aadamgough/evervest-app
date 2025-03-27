@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         }
 
         // Format the prompt for LLaMA API
-        const prompt = `
+        let prompt = `
         # CONTEXT #
         You are a financial advisor seeking an optimized investment plan for a client. You will be given a list of client responses to a questionnaire 
         that deals with their financial situation, risk tolerance, and investment goals.
