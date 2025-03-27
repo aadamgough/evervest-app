@@ -30,6 +30,17 @@ function Dashboard() {
                     return;
                 }
 
+                // Update Schwab data first
+                await fetch('/api/investments/update-schwab-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: session.user.id
+                    })
+                });
+
                 // Fetch user data and linked accounts in parallel
                 const [userData, accountsData] = await Promise.all([
                     supabase
@@ -133,11 +144,16 @@ function Dashboard() {
                             ))}
                             {linkedAccounts.length === 0 && (
                                 <div className="no-accounts-message">
-                                    <p>No accounts linked yet.</p>
-                                    <button onClick={() => navigate('/profile')} className="link-account-button">
-                                        Link Account
-                                    </button>
-                                </div>
+                                <h3>Welcome to EverVest!</h3>
+                                <p>To get started with your investment journey, please link your brokerage account.</p>
+                                <p>Currently supporting Charles Schwab accounts.</p>
+                                <button 
+                                    onClick={() => navigate('/profile')} 
+                                    className="link-account-button"
+                                >
+                                    Link Your First Account
+                                </button>
+                            </div>
                             )}
                         </div>
                     </div>

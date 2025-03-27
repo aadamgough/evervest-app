@@ -118,7 +118,7 @@ export default async function handler(req, res) {
                 content: prompt.trim()
             }],
             temperature: 0.7,
-            max_tokens: 2000, // the free version of vercel only allows a 10 second max processing time, so I shorten max tokens
+            max_tokens: 2000, // TODO: the free version of vercel only allows a 10 second max processing time, but play around to find optimate
             top_p: 1,
             frequency_penalty: 0.0,
             presence_penalty: 0.0,
@@ -159,8 +159,9 @@ export default async function handler(req, res) {
 
         // Insert into database with LLaMA-generated plan
         const { data, error } = await supabase
-            .from('investment_plans')
-            .upsert([
+        .from('investment_plans')
+        .upsert(
+            [
                 {
                     user_id,
                     selected_options,
@@ -169,8 +170,13 @@ export default async function handler(req, res) {
                         generated_plan: planData.choices[0].message.content
                     }
                 }
-            ])
-            .select();
+            ],
+            {
+                onConflict: 'user_id',
+                ignoreDuplicates: false
+            }
+        )
+        .select();
 
         if (error) {
             console.error('Database insert error:', error);

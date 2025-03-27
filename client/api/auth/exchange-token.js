@@ -54,31 +54,14 @@ async function refreshToken(refresh_token) {
 }
 
 export default async function handler(req, res) { 
-    console.log('Exchange token endpoint hit');
-    console.log('Request body:', req.body);
 
     // Get the authorization header
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ 
-            error: 'No valid authorization header',
-            details: 'Authorization header must be Bearer token'
-        });
-    }
 
     // Extract user ID from request body
     const { code, state, userId } = req.body;
     if (!userId) {
         return res.status(400).json({ error: 'No user ID provided' });
-    }
-
-    console.log('User ID from request:', userId);
-
-    // Handle CORS
-    if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        return res.status(200).end();
     }
 
     // Set CORS headers
@@ -129,9 +112,9 @@ export default async function handler(req, res) {
         
         // Read the response body only once
         const responseText = await tokenResponse.text();
-        console.log("Token Response Body:", responseText);
         
         let tokens;
+
         try {
             tokens = JSON.parse(responseText);
             console.log("Parsed tokens:", tokens);
@@ -144,10 +127,6 @@ export default async function handler(req, res) {
                 });
             }
 
-
-            console.log("Attempting to fetch accounts with token:", tokens.access_token.substring(0, 20) + '...');
-
-            // Get account information using the parsed tokens
             const accountsResponse = await fetch('https://api.schwabapi.com/trader/v1/accounts', {
                 headers: {
                     'Authorization': `Bearer ${tokens.access_token}`
@@ -168,7 +147,6 @@ export default async function handler(req, res) {
             }
             
             const accountsData = await accountsResponse.json();
-            console.log('Accounts response:', accountsData);
 
             // Adjust the database storage loop for the new structure
             for (const accountWrapper of accountsData) {
