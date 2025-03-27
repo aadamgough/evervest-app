@@ -126,7 +126,7 @@ export default async function handler(req, res) {
                     content: prompt
                 }],
                 temperature: 0.7,
-                max_tokens: 4000,         
+                max_tokens: null,         
                 top_p: 1,                 
                 frequency_penalty: 0.0,
                 presence_penalty: 0.0,
