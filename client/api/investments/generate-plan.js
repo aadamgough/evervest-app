@@ -114,6 +114,28 @@ export default async function handler(req, res) {
         console.log('API Key exists:', !!process.env.LLAMA_API_KEY);
         console.log('API Key first few characters:', process.env.LLAMA_API_KEY ? process.env.LLAMA_API_KEY.substring(0, 4) + '...' : 'no key');
 
+        const requestBody = {
+            model: "llama3.1-70b", 
+            messages: [{
+                role: "user",
+                content: prompt.trim()
+            }],
+            temperature: 0.7,
+            max_tokens: 2000,
+            top_p: 1,
+            frequency_penalty: 0.0,
+            presence_penalty: 0.0,
+            stream: false,
+            n: 1
+        };
+
+        // Log API request details
+        console.log('Sending request to LLaMA API with configuration:', {
+            model: requestBody.model,
+            promptLength: requestBody.messages[0].content.length,
+            max_tokens: requestBody.max_tokens
+        });
+
         // Call LLaMA API
         const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
             method: 'POST',
@@ -121,29 +143,29 @@ export default async function handler(req, res) {
                 'Authorization': `Bearer ${process.env.LLAMA_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                model: "llama3-70b",  
-                messages: [{
-                    role: "user",
-                    content: prompt
-                }],
-                temperature: 0.7,
-                max_tokens: null,         
-                top_p: 1,                 
-                frequency_penalty: 0.0,
-                presence_penalty: 0.0,
-                stream: false,          
-                n: 1                  
-            })
+            body: JSON.stringify(requestBody)
         });
 
         console.log('LLaMA API response:', llamaResponse);
+        console.log('LLaMA API response headers:', Object.fromEntries(llamaResponse.headers.entries()));
+
 
         if (!llamaResponse.ok) {
-            console.error('LLaMA API error status:', llamaResponse.status);
             const errorText = await llamaResponse.text();
-            console.error('LLaMA API error:', errorText);
-            return res.status(500).json({ error: 'Failed to generate plan from LLaMA API' });
+            console.error('LLaMA API error details:', {
+                status: llamaResponse.status,
+                statusText: llamaResponse.statusText,
+                error: errorText,
+                requestConfig: {
+                    model: requestBody.model,
+                    promptLength: prompt.length,
+                    max_tokens: requestBody.max_tokens
+                }
+            });
+            return res.status(500).json({ 
+                error: 'Failed to generate plan from LLaMA API',
+                details: errorText
+            });
         }
 
         const planData = await llamaResponse.json();
