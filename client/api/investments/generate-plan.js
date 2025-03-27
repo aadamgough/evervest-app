@@ -131,6 +131,7 @@ export default async function handler(req, res) {
         });
 
         if (!llamaResponse.ok) {
+            console.error('LLaMA API error status:', llamaResponse.status);
             const errorText = await llamaResponse.text();
             console.error('LLaMA API error:', errorText);
             return res.status(500).json({ error: 'Failed to generate plan from LLaMA API' });
