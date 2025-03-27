@@ -144,22 +144,58 @@ function Investments() {
     };
 
     const formatPlanContent = (planContent) => {
-        // Split the content into sections based on newlines
-        const sections = planContent.split(/\n\s*\n/); // Split on one or more newlines
+        // Split content into sections
+        const sections = planContent.split(/\n\s*\n/);
     
         return sections.map((section, index) => {
             if (section.trim().length === 0) return null; // Skip empty sections
             
-                
-            console.log("this is the section",section);
-            
+            // Check for section headers and format accordingly
+            if (section.startsWith("Investment Strategy Overview")) {
+                return (
+                    <div key={index} className="mb-4">
+                        <h2 className="text-lg font-bold">Investment Strategy Overview</h2>
+                        <p className="mt-2">{section.replace("Investment Strategy Overview: ", "")}</p>
+                    </div>
+                );
+            }
+    
+            if (section.startsWith("Recommended Accounts & Asset Allocation")) {
+                return (
+                    <div key={index} className="mb-4">
+                        <h2 className="text-lg font-bold">Recommended Accounts & Asset Allocation</h2>
+                    </div>
+                );
+            }
+    
+            // Formatting for individual account sections
+            const accountMatch = section.match(/(\d+)\.\s(.+?)\s\((\d+%)\)/);
+            if (accountMatch) {
+                const [_, number, accountName, percentage] = accountMatch;
+                const assets = section
+                    .split("\n")
+                    .slice(1) // Remove the account title line
+                    .map((line, idx) => <li key={idx}>{line.trim()}</li>);
+    
+                return (
+                    <div key={index} className="mb-4">
+                        <h3 className="text-md font-semibold">
+                            {number}. {accountName} ({percentage})
+                        </h3>
+                        <ul className="list-disc pl-5 mt-1">{assets}</ul>
+                    </div>
+                );
+            }
+    
+            // General fallback (for final summary or implementation steps)
             return (
-                <div key={index} className="plan-header">
-                    {section}
+                <div key={index} className="mb-4">
+                    <p>{section}</p>
                 </div>
             );
         });
     };
+    
 
     if (loading) return <div className="loading-spinner">Loading...</div>;
 

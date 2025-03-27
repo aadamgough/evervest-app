@@ -110,9 +110,6 @@ export default async function handler(req, res) {
                 prompt += `${question}: ${answer}\n`;
             });
         }
-        
-        console.log('API Key exists:', !!process.env.LLAMA_API_KEY);
-        console.log('API Key first few characters:', process.env.LLAMA_API_KEY ? process.env.LLAMA_API_KEY.substring(0, 4) + '...' : 'no key');
 
         const requestBody = {
             model: "llama3.1-70b", 
@@ -121,20 +118,13 @@ export default async function handler(req, res) {
                 content: prompt.trim()
             }],
             temperature: 0.7,
-            max_tokens: 2000,
+            max_tokens: 5000,
             top_p: 1,
             frequency_penalty: 0.0,
             presence_penalty: 0.0,
             stream: false,
             n: 1
         };
-
-        // Log API request details
-        console.log('Sending request to LLaMA API with configuration:', {
-            model: requestBody.model,
-            promptLength: requestBody.messages[0].content.length,
-            max_tokens: requestBody.max_tokens
-        });
 
         // Call LLaMA API
         const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
@@ -145,9 +135,6 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify(requestBody)
         });
-
-        console.log('LLaMA API response:', llamaResponse);
-        console.log('LLaMA API response headers:', Object.fromEntries(llamaResponse.headers.entries()));
 
 
         if (!llamaResponse.ok) {
@@ -173,7 +160,7 @@ export default async function handler(req, res) {
         // Insert into database with LLaMA-generated plan
         const { data, error } = await supabase
             .from('investment_plans')
-            .insert([
+            .upsert([
                 {
                     user_id,
                     selected_options,
