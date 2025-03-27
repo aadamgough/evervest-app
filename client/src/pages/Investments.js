@@ -144,50 +144,52 @@ function Investments() {
     };
 
     const formatPlanContent = (planContent) => {
+        // Remove unwanted asterisks used for bold formatting
+        planContent = planContent.replace(/\*\*/g, "");
+    
         // Split content into sections
         const sections = planContent.split(/\n\s*\n/);
     
         return sections.map((section, index) => {
             if (section.trim().length === 0) return null; // Skip empty sections
-            
+    
             // Check for section headers and format accordingly
             if (section.startsWith("Investment Strategy Overview")) {
                 return (
-                    <div key={index} className="mb-4">
+                    <div key={index} className="mb-6">
                         <h2 className="text-lg font-bold">Investment Strategy Overview</h2>
-                        <p className="mt-2">{section.replace("Investment Strategy Overview: ", "")}</p>
+                        <p className="mt-2">{section.replace("Investment Strategy Overview:", "").trim()}</p>
                     </div>
                 );
             }
     
             if (section.startsWith("Recommended Accounts & Asset Allocation")) {
                 return (
-                    <div key={index} className="mb-4">
+                    <div key={index} className="mb-6">
                         <h2 className="text-lg font-bold">Recommended Accounts & Asset Allocation</h2>
                     </div>
                 );
             }
     
             // Formatting for individual account sections
-            const accountMatch = section.match(/(\d+)\.\s(.+?)\s\((\d+%)\)/);
+            const accountMatch = section.match(/^(\d+)\.\s(.+?)\s-\s(.+)/);
             if (accountMatch) {
-                const [_, number, accountName, percentage] = accountMatch;
-                const assets = section
-                    .split("\n")
-                    .slice(1) // Remove the account title line
-                    .map((line, idx) => <li key={idx}>{line.trim()}</li>);
+                const [_, number, accountName, assetDetails] = accountMatch;
+    
+                // Split asset details into a bullet list
+                const assets = assetDetails.split(" - ").map((asset, idx) => (
+                    <li key={idx} className="mt-1">{asset.trim()}</li>
+                ));
     
                 return (
                     <div key={index} className="mb-4">
-                        <h3 className="text-md font-semibold">
-                            {number}. {accountName} ({percentage})
-                        </h3>
+                        <h3 className="text-md font-semibold">{number}. {accountName}</h3>
                         <ul className="list-disc pl-5 mt-1">{assets}</ul>
                     </div>
                 );
             }
     
-            // General fallback (for final summary or implementation steps)
+            // General fallback (for final summary or additional details)
             return (
                 <div key={index} className="mb-4">
                     <p>{section}</p>
